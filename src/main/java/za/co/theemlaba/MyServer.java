@@ -198,15 +198,15 @@ public class MyServer {
                 dos.writeUTF(str);
                 dos.flush();
                 dos.writeUTF("should?");
-                game();
-                // String shouldContinue = getAnswer();
-                // System.out.println("answer found");
-                // if (shouldContinue.matches("yes")) {
-                //     game();
-                // }
-                // else {
-                //     clientSocket.close();
-                // }
+                // game();
+                String shouldContinue = getAnswer();
+                System.out.println("answer found");
+                if (shouldContinue.matches("yes")) {
+                    game();
+                }
+                else {
+                    clientSocket.close();
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();

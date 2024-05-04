@@ -25,7 +25,14 @@ public class MyClient {
                 String response = din.readUTF();
                 System.out.println("Server response = " + response);
 
+                // for a question
                 if (response.startsWith("What is")) {
+                    command = line.nextLine();
+                    dout.writeUTF(command);
+                }
+
+                // should restart game?
+                if (response.startsWith("should")) {
                     command = line.nextLine();
                     dout.writeUTF(command);
                 }
