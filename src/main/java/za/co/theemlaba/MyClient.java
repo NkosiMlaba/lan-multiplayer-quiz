@@ -17,13 +17,20 @@ public class MyClient {
             DataOutputStream dout = new DataOutputStream(sThisClient.getOutputStream());
             DataInputStream din = new DataInputStream(sThisClient.getInputStream());
             
+            String command = line.nextLine();
+            dout.writeUTF(command);
+
             while (true) {
-                String command = line.nextLine();
-                
-                dout.writeUTF(command);
 
                 String response = din.readUTF();
-                System.out.println("Server response: " + response);
+                System.out.println("Server response = " + response);
+
+                if (response.startsWith("What is")) {
+                    command = line.nextLine();
+                    dout.writeUTF(command);
+                }
+
+                
 
                 if (command.matches("quit")){
                     break;
