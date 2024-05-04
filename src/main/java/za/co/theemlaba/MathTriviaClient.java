@@ -132,39 +132,8 @@ public class MathTriviaClient {
                 Thread.sleep(1000); // Wait for 1 second
             }
 
-            // Start game
-            System.out.println("Starting the game...");
-            // Implement the rest of the game logic here...
-            for (int i = 0; i < 5; i++) {
-                // Receive and display question
-                String question = in.readLine();
-                System.out.println("Question " + (i + 1) + ": " + question);
-
-                // Start timer
-                long startTime = System.currentTimeMillis();
-
-                // Read user answer
-                System.out.print("Your answer: ");
-                String answer = scanner.nextLine();
-
-                // Send answer to server
-                out.println(answer);
-
-                // Receive and display result
-                String result = in.readLine();
-                System.out.println("Result: " + result);
-
-                // Calculate and display time taken
-                long timeTaken = System.currentTimeMillis() - startTime;
-                System.out.println("Time taken: " + timeTaken + " ms");
-            }
-
-            // Receive and display final results
-            String finalResults = in.readLine();
-            System.out.println("Final Results: " + finalResults);
-
-
-            //
+            // Start receiving questions and answering
+            receiveQuestionsAndAnswer();
 
             // Close resources
             socket.close();
@@ -177,8 +146,21 @@ public class MathTriviaClient {
         }
     }
 
+    private void receiveQuestionsAndAnswer() throws IOException {
+        String question;
+        while ((question = in.readLine()) != null) {
+            System.out.println("Question: " + question);
+            System.out.print("Your answer: ");
+            String answer = scanner.nextLine();
+            out.println(answer);
+            String response = in.readLine();
+            System.out.println(response);
+        }
+    }
+
     public static void main(String[] args) {
         MathTriviaClient client = new MathTriviaClient();
         client.start();
     }
 }
+

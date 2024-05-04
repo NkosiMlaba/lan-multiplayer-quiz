@@ -15,11 +15,15 @@ public class MyClient {
             
             Socket sThisClient = new Socket(address, 6666);
             DataOutputStream dout = new DataOutputStream(sThisClient.getOutputStream());
+            DataInputStream din = new DataInputStream(sThisClient.getInputStream());
             
             while (true) {
                 String command = line.nextLine();
                 
                 dout.writeUTF(command);
+
+                String response = din.readUTF();
+                System.out.println("Server response: " + response);
 
                 if (command.matches("quit")){
                     break;
