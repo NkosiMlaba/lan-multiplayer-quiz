@@ -13,7 +13,7 @@ public class Question {
         return expression;
     }
 
-    public String getAnswer() {
+    public String getCorrectAnswer() {
         return answer;
     }
 }

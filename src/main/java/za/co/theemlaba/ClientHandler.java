@@ -66,12 +66,12 @@ public class ClientHandler implements Runnable {
         for (Question currentQuestion : questions) {
 
             sendQuestion(currentQuestion.getExpression());
-            String correctAnswer = currentQuestion.getAnswer();
+            String correctAnswer = currentQuestion.getCorrectAnswer();
 
             String userAnswer = getAnswer().strip();
             
             // Pattern.matches((?i) + correctAnswer, userAnswer)
-            if (Pattern.matches(("(?i)" + correctAnswer), userAnswer)) {
+            if (Pattern.matches("(?i)" + correctAnswer, userAnswer)) {
                 sendResponseToQuestion("correct");
                 score++;
                 continue;
@@ -119,7 +119,7 @@ public class ClientHandler implements Runnable {
     public String getAnswer(){
         String message = "";
         try {
-            message = dis.readUTF();
+            message = dis.readUTF().strip();
             System.out.println("Client " + clientIdentifier + " says: " + message);
 
         } catch (IOException e) {
