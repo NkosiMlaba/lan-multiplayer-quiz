@@ -429,9 +429,9 @@ public class MathTriviaServer {
 
 class Question {
     private String expression;
-    private int answer;
+    private String answer;
 
-    public Question(String expression, int answer) {
+    public Question(String expression, String answer) {
         this.expression = expression;
         this.answer = answer;
     }
@@ -440,7 +440,7 @@ class Question {
         return expression;
     }
 
-    public int getAnswer() {
+    public String getAnswer() {
         return answer;
     }
 }
