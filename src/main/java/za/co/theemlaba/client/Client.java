@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class MyClient {
+public class Client {
     static String address = "20.20.15.94";
     private static final int COUNTDOWN_DURATION = 5; // Countdown duration in seconds
     static Scanner line = new Scanner(System.in);

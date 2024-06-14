@@ -28,30 +28,47 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+        
         try {
             this.dis = new DataInputStream(clientSocket.getInputStream());
             this.dos = new DataOutputStream(clientSocket.getOutputStream());
             this.clientIdentifier = getClientIdentifier(clientSocket);
             this.commandLine = new Scanner(System.in);
+        } catch (IOException e) {
+            System.out.println("Failed to create input stream for client " + clientIdentifier);
+            e.printStackTrace();
+            System.exit(0);
+        }
 
-
-            while (true) {
-                String message = dis.readUTF();
-
-                if (message.equalsIgnoreCase("quit")) {
-                    break;
-                }
-
-                System.out.println("Client " + clientIdentifier + " says: " + message);
-
-                game();
+        while (true) {
+            
+            String message = "";
+            try {
+                message = dis.readUTF();
+            } catch (IOException e) {
+                // statement to print
+                e.printStackTrace();
             }
 
-            System.out.println("Client " + clientIdentifier + " disconnected.");
+            if (message.equalsIgnoreCase("quit")) {
+                break;
+            }
+
+            System.out.println("Client " + clientIdentifier + " says: " + message);
+
+            game();
+        }
+
+        System.out.println("Client " + clientIdentifier + " disconnected.");
+        try {
             clientSocket.close();
         } catch (IOException e) {
+            System.out.println("Failed to properly disconnect client " + clientIdentifier);
+            printLineBreak();
             e.printStackTrace();
+            System.exit(0);
         }
+        
     }
 
     private String getClientIdentifier(Socket clientSocket) {
@@ -65,10 +82,10 @@ public class ClientHandler implements Runnable {
         Collections.shuffle(questions);
         for (Question currentQuestion : questions) {
 
-            sendQuestion(currentQuestion.getExpression());
+            sendResponseOutput(currentQuestion.getExpression());
             String correctAnswer = currentQuestion.getCorrectAnswer();
 
-            String userAnswer = getAnswer().strip();
+            String userAnswer = getRequestInput().strip();
             
             // Pattern.matches((?i) + correctAnswer, userAnswer)
             if (Pattern.matches("(?i)" + correctAnswer, userAnswer)) {
@@ -88,7 +105,7 @@ public class ClientHandler implements Runnable {
             dos.flush();
             dos.writeUTF("should we continue the game?");
             // game();
-            String shouldContinue = getAnswer();
+            String shouldContinue = getRequestInput();
             System.out.println("answer found");
             if (shouldContinue.matches("yes")) {
                 game();
@@ -105,7 +122,7 @@ public class ClientHandler implements Runnable {
 
     }
 
-    public void sendQuestion(String question) {
+    public void sendResponseOutput (String question) {
         String response = "What is: ";
         try {
             dos.writeUTF(response + question);
@@ -116,15 +133,17 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public String getAnswer(){
+    public String getRequestInput(){
         String message = "";
+        
         try {
             message = dis.readUTF().strip();
             System.out.println("Client " + clientIdentifier + " says: " + message);
-
         } catch (IOException e) {
+            System.out.println("Failed to get input from clients");
             e.printStackTrace();
         }
+        
         return message;
     }
 
@@ -153,5 +172,9 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         }
         return questions;
+    }
+
+    private void printLineBreak () {
+        System.out.println("---------------------------------------------------------------");
     }
 }
