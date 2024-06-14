@@ -1,4 +1,4 @@
-package za.co.theemlaba;
+package za.co.theemlaba.server;
 
 import java.io.*;
 import java.net.*;

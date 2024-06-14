@@ -1,4 +1,4 @@
-package za.co.theemlaba;
+package za.co.theemlaba.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
