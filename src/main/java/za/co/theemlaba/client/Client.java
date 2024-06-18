@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class Client {
     static String address = "20.20.15.94";
-    private static final int COUNTDOWN_DURATION = 5; // Countdown duration in seconds
+    private static final int COUNTDOWN_DURATION = 2; // Countdown duration in seconds
     static Scanner line = new Scanner(System.in);
     // initailising variables;
     static Socket sThisClient = null;
@@ -56,7 +56,7 @@ public class Client {
         // receive responses and send requests
         while (true) {
             String response = readResponse();
-            System.out.println("Server response = " + response);
+            System.out.println(response);
 
             // close from server
             if (response.startsWith("close")) {
@@ -65,7 +65,7 @@ public class Client {
             }
 
             // for a question
-            if (response.startsWith("What")) {
+            if (response.startsWith("Options")) {
                 command = line.nextLine();
                 sendRequest(command);
             }

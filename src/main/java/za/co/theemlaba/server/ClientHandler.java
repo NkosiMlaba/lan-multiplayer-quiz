@@ -3,11 +3,13 @@ package za.co.theemlaba.server;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class ClientHandler implements Runnable {
     final Socket clientSocket;
@@ -40,7 +42,7 @@ public class ClientHandler implements Runnable {
             }
             
             if (message.equalsIgnoreCase("quit")) {
-                sendResponseOutput("Thank you for playing. Goodbye.");
+                sendMessage("Thank you for playing. Goodbye.");
                 sendCloseFlag();
                 disconnectClient();
                 return;
@@ -65,9 +67,19 @@ public class ClientHandler implements Runnable {
         Collections.shuffle(questions);
         for (Question currentQuestion : questions) {
 
-            sendResponseOutput(currentQuestion.getExpression());
-            String correctAnswer = currentQuestion.getCorrectAnswer();
-
+            sendQuestion(currentQuestion.getExpression());
+            
+            String[] optionsGiven = currentQuestion.getPotentialAnswers();
+            optionsGiven = shuffleArray(optionsGiven);
+            
+            //!!!!
+            
+            sendOptions(optionsGiven);
+            
+            // String correctAnswer = new String(optionsGiven).indexOf("e"); //currentQuestion.getCorrectAnswer();
+            List<String> asList  = Arrays.asList(optionsGiven);
+            String correctAnswer = String.valueOf(asList.indexOf(currentQuestion.getCorrectAnswer()));
+            
             String userAnswer = getRequestInput().strip();
 
             // Pattern.matches((?i) + correctAnswer, userAnswer)
@@ -96,10 +108,36 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void sendResponseOutput(String question) {
+    public void sendQuestion(String question) {
         String response = "What is: ";
         try {
             dos.writeUTF(response + question);
+            dos.flush();
+            // dos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendOptions(String[] options) {
+        String response = "Options: \n";
+        int count = 1;
+        for (String option : options) {
+            response += "    [" + count + "] " + option.strip() + "\n";
+            count++;
+        }
+        try {
+            dos.writeUTF(response);
+            dos.flush();
+            // dos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessage(String message) {
+        try {
+            dos.writeUTF(message);
             dos.flush();
             // dos.flush();
         } catch (IOException e) {
@@ -131,15 +169,17 @@ public class ClientHandler implements Runnable {
     }
 
     private List<Question> readQuestionsFromCSV() {
+        String directoryPath = getQuestionsDirectory();
         List<Question> questions = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(QUESTIONS_FILE))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(directoryPath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length == 2) {
+                if (data.length == 3) {
                     String expression = data[0].trim();
                     String answer = data[1].trim();
-                    questions.add(new Question(expression, answer));
+                    String[] potentialAnswerArray = data[2].trim().replace("\"", "").split(" ");
+                    questions.add(new Question(expression, answer, potentialAnswerArray));
                 }
             }
         } catch (IOException e) {
@@ -197,5 +237,29 @@ public class ClientHandler implements Runnable {
             System.out.println("Could not send close flag to client " + clientIdentifier);
             e.printStackTrace();
         }
+    }
+
+    public String getQuestionsDirectory() {
+        String directoryPath = "";
+        try {
+            String path = new File(ClientHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+            String otherFilePath = "/../src/main/java/za/co/theemlaba/server/"; // src/main/java/za/co/theemlaba/server/questions.csv
+            directoryPath = new File(path).getParent() + otherFilePath + QUESTIONS_FILE;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to read questions from CSV");
+            System.exit(0);
+        }
+        return directoryPath;
+    }
+
+    public String[] shuffleArray (String[] array) {
+        String[] optionsArray = array;
+
+		List<String> optionsList = Arrays.asList(optionsArray);
+
+		Collections.shuffle(optionsList);
+
+		return optionsList.toArray(optionsArray);
     }
 }
