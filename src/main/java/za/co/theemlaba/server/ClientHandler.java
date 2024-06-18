@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
@@ -63,38 +64,86 @@ public class ClientHandler implements Runnable {
 
     public void game() {
         int score = 0;
-
+        Map<String, List<Object>> map = new HashMap<>();
         Collections.shuffle(questions);
         for (Question currentQuestion : questions) {
-
             sendQuestion(currentQuestion.getExpression());
-            
             String[] optionsGiven = currentQuestion.getPotentialAnswers();
-            optionsGiven = shuffleArray(optionsGiven);
+            List<String> ListOfOptionsGiven = Arrays.asList(optionsGiven);
+		    Collections.shuffle(ListOfOptionsGiven);
+            sendOptions(ListOfOptionsGiven);
             
-            //!!!!
-            
-            sendOptions(optionsGiven);
-            
-            // String correctAnswer = new String(optionsGiven).indexOf("e"); //currentQuestion.getCorrectAnswer();
-            List<String> asList  = Arrays.asList(optionsGiven);
-            String correctAnswer = String.valueOf(asList.indexOf(currentQuestion.getCorrectAnswer()));
-            
+            String correctAnswer = String.valueOf(ListOfOptionsGiven.indexOf(currentQuestion.getCorrectAnswer()) + 1);
             String userAnswer = getRequestInput().strip();
 
-            // Pattern.matches((?i) + correctAnswer, userAnswer)
-            if (Pattern.matches("(?i)" + correctAnswer, userAnswer)) {
-                sendResponseToQuestion("correct");
+            ArrayList<Object> options = new ArrayList<>();
+            options.add(currentQuestion.getCorrectAnswer());
+
+            List<String> numberOfOptionsList = getOptionNumbers(ListOfOptionsGiven.size());
+            if (correctAnswer.equals(userAnswer)) {
+                sendResponseToQuestion("Correct");
                 score++;
-                continue;
-            } else {
-                sendResponseToQuestion("wrong");
+                options.add(currentQuestion.getCorrectAnswer());
             }
+            else if (numberOfOptionsList.contains(userAnswer)) {
+                sendResponseToQuestion("Wrong");
+                int indexOfOption = Integer.parseInt(userAnswer) - 1;
+                String userStringAnswer = ListOfOptionsGiven.get(indexOfOption);
+                options.add(userStringAnswer);
+            }else {
+                sendResponseToQuestion("Wrong");
+                options.add(userAnswer);
+            }
+
+            map.put(currentQuestion.getExpression(), options);
         }
 
         sendResponseToQuestion("Game over");
+        
         String str = String.valueOf(score);
-        sendResponseToQuestion(str);
+        sendResponseToQuestion("Your final score is: " + str + " out of " + String.valueOf(questions.size()));
+        String percentageString = String.valueOf(calculatePercentage(score, questions.size()));
+        sendResponseToQuestion("For a final percentage score of: " + percentageString + "%");
+
+        // would you like to review your answers?
+        sendResponseToQuestion("would you like to review your answers?");
+        String message = "";
+
+        message = readRequest();
+        if (message.matches("yes")) {
+            for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
+                
+                sendResponseToQuestion("Question: " + entry.getKey());
+                List<Object> answers = entry.getValue();
+                sendResponseToQuestion("Correct Answer: " + answers.get(0));
+                sendResponseToQuestion("Your Answer: " + answers.get(1));
+
+                if (answers.get(1).equals(answers.get(0))) {
+                    continue;
+                } else {
+                    sendResponseToQuestion("Ask meta AI for an explanation?");
+                }
+
+                message = readRequest();
+                
+                if (message.equalsIgnoreCase("already disconnected")) {
+                    return;
+                }
+                
+                if (message.equalsIgnoreCase("quit")) {
+                    sendMessage("Thank you for playing. Goodbye.");
+                    sendCloseFlag();
+                    disconnectClient();
+                    return;
+                }
+
+                if (!message.equalsIgnoreCase("yes")) {
+                    break;
+                }
+
+                sendResponseToQuestion(RunPythonScript.main(new String[] {"Why is " + answers.get(0) + " the answer to " + entry.getKey() + "?"})); //" and not " + answers.get(1) +
+            }
+        } 
         sendResponseToQuestion("should we continue the game?");
         
         String shouldContinue = getRequestInput();
@@ -119,7 +168,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void sendOptions(String[] options) {
+    public void sendOptions(List<String> options) {
         String response = "Options: \n";
         int count = 1;
         for (String option : options) {
@@ -253,13 +302,21 @@ public class ClientHandler implements Runnable {
         return directoryPath;
     }
 
-    public String[] shuffleArray (String[] array) {
-        String[] optionsArray = array;
+    public List<String> getOptionNumbers(int numberOfOptions) {
+        List<String> stringList = new ArrayList<>();
+        
+        for (int i = 0; i < numberOfOptions; i++) {
+            stringList.add(String.valueOf(i));
+        }
 
-		List<String> optionsList = Arrays.asList(optionsArray);
-
-		Collections.shuffle(optionsList);
-
-		return optionsList.toArray(optionsArray);
+        return stringList;
     }
+
+    public static int calculatePercentage(int part, int whole) {
+        if (whole == 0) {
+            throw new IllegalArgumentException("The whole value cannot be zero.");
+        }
+        return (part / whole) * 100;
+    }
+
 }

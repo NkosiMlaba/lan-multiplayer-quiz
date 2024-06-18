@@ -71,7 +71,9 @@ public class Client {
             }
 
             // should restart game?
-            if (response.startsWith("should")) {
+            if (response.startsWith("should") 
+            || response.startsWith("would you like to review your answers?")
+            || response.startsWith("Ask meta AI for an explanation?")) {
                 command = line.nextLine();
                 sendRequest(command);
             }
