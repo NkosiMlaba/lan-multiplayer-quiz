@@ -21,58 +21,41 @@ public class ClientHandler implements Runnable {
     List<Question> questions = readQuestionsFromCSV();
 
     // constructor
-    public ClientHandler (Socket clientSocket) {
+    public ClientHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
     }
-    
 
     @Override
     public void run() {
-        
-        try {
-            this.dis = new DataInputStream(clientSocket.getInputStream());
-            this.dos = new DataOutputStream(clientSocket.getOutputStream());
-            this.clientIdentifier = getClientIdentifier(clientSocket);
-            this.commandLine = new Scanner(System.in);
-        } catch (IOException e) {
-            System.out.println("Failed to create input stream for client " + clientIdentifier);
-            e.printStackTrace();
-            System.exit(0);
-        }
 
+        initialiseDataStreams();
+
+        String message = "";
+        
         while (true) {
+            message = readRequest();
+
+            if (message.equalsIgnoreCase("already disconnected")) {
+                return;
+            }
             
-            String message = "";
-            try {
-                message = dis.readUTF();
-            } catch (IOException e) {
-                // statement to print
-                e.printStackTrace();
+            if (message.equalsIgnoreCase("quit")) {
+                sendResponseOutput("Thank you for playing. Goodbye.");
+                sendCloseFlag();
+                disconnectClient();
+                return;
             }
 
-            if (message.equalsIgnoreCase("quit")) {
+            if (message.equalsIgnoreCase("start")) {
                 break;
             }
-
-            System.out.println("Client " + clientIdentifier + " says: " + message);
-
-            game();
-        }
-
-        System.out.println("Client " + clientIdentifier + " disconnected.");
-        try {
-            clientSocket.close();
-        } catch (IOException e) {
-            System.out.println("Failed to properly disconnect client " + clientIdentifier);
-            printLineBreak();
-            e.printStackTrace();
-            System.exit(0);
         }
         
+
+        game();
     }
 
     private String getClientIdentifier(Socket clientSocket) {
-        // Here you can determine the identifier based on client's IP address or any other parameter
         return clientSocket.getInetAddress().getHostAddress(); // Using client's IP address as identifier
     }
 
@@ -86,7 +69,7 @@ public class ClientHandler implements Runnable {
             String correctAnswer = currentQuestion.getCorrectAnswer();
 
             String userAnswer = getRequestInput().strip();
-            
+
             // Pattern.matches((?i) + correctAnswer, userAnswer)
             if (Pattern.matches("(?i)" + correctAnswer, userAnswer)) {
                 sendResponseToQuestion("correct");
@@ -97,32 +80,23 @@ public class ClientHandler implements Runnable {
             }
         }
 
-        try {
-            dos.writeUTF("Game over");
-            dos.flush();
-            String str = String.valueOf(score);
-            dos.writeUTF(str);
-            dos.flush();
-            dos.writeUTF("should we continue the game?");
-            // game();
-            String shouldContinue = getRequestInput();
-            System.out.println("answer found");
-            if (shouldContinue.matches("yes")) {
-                game();
-            }
-            else {
-                clientSocket.close();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendResponseToQuestion("Game over");
+        String str = String.valueOf(score);
+        sendResponseToQuestion(str);
+        sendResponseToQuestion("should we continue the game?");
         
-
-
+        String shouldContinue = getRequestInput();
+        System.out.println("answer found");
+        
+        if (shouldContinue.matches("yes")) {
+            game();
+        } else {
+            sendCloseFlag();
+            disconnectClient();
+        }
     }
 
-    public void sendResponseOutput (String question) {
+    public void sendResponseOutput(String question) {
         String response = "What is: ";
         try {
             dos.writeUTF(response + question);
@@ -133,9 +107,9 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public String getRequestInput(){
+    public String getRequestInput() {
         String message = "";
-        
+
         try {
             message = dis.readUTF().strip();
             System.out.println("Client " + clientIdentifier + " says: " + message);
@@ -143,11 +117,11 @@ public class ClientHandler implements Runnable {
             System.out.println("Failed to get input from clients");
             e.printStackTrace();
         }
-        
+
         return message;
     }
 
-    public void sendResponseToQuestion(String status){
+    public void sendResponseToQuestion(String status) {
         try {
             dos.writeUTF(status);
             dos.flush();
@@ -174,7 +148,54 @@ public class ClientHandler implements Runnable {
         return questions;
     }
 
-    private void printLineBreak () {
+    private void printLineBreak() {
         System.out.println("---------------------------------------------------------------");
+    }
+
+    private void initialiseDataStreams() {
+        try {
+            this.dis = new DataInputStream(clientSocket.getInputStream());
+            this.dos = new DataOutputStream(clientSocket.getOutputStream());
+            this.clientIdentifier = getClientIdentifier(clientSocket);
+            this.commandLine = new Scanner(System.in);
+        } catch (IOException e) {
+            System.out.println("Failed to create input stream for client " + clientIdentifier);
+            e.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+    public String readRequest () {
+        String message = "";
+        try {
+            message = dis.readUTF();
+        } catch (IOException e) {
+            message = "already disconnected";
+            System.out.println("Client " + clientIdentifier + " premetruely closed the connection.");
+            // e.printStackTrace();
+        }
+
+        return message;
+    }
+
+    public void disconnectClient () {
+        System.out.println("Client " + clientIdentifier + " disconnected.");
+        try {
+            clientSocket.close();
+        } catch (IOException e) {
+            System.out.println("Failed to properly disconnect client " + clientIdentifier);
+            printLineBreak();
+            e.printStackTrace();
+        }
+    }
+
+    public void sendCloseFlag () {
+        try {
+            dos.writeUTF("close");
+            dos.flush();
+        } catch (IOException e) {
+            System.out.println("Could not send close flag to client " + clientIdentifier);
+            e.printStackTrace();
+        }
     }
 }
