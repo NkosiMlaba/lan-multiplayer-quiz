@@ -56,6 +56,10 @@ This is a simple multiplayer quiz game that can be played over a local area netw
 3. Start the server: `node server.js`
 4. Open multiple browser windows or tabs and navigate to `http://localhost:3000` to join the game.
 
+## Running the Server
+
+1. Navigate to the server directory: `lan-multiplayer-quiz/src/main/java/za/co/theemlaba/server/llama3client.py`
+
 ## How to Play
 
 1. One player will be designated as the host and will create a new game room.
