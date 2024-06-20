@@ -49,6 +49,7 @@ public class Client {
             System.out.println(i + "...");
             sleep(1000);
         }
+        printLineBreak();
         
         // send start game
         sendRequest(command);
@@ -59,6 +60,11 @@ public class Client {
             System.out.println(response);
 
             // close from server
+            if (response.startsWith("Correct") || response.startsWith("Wrong") ||
+            response.startsWith("For a final")) {
+                printLineBreak();
+            }
+            
             if (response.startsWith("close")) {
                 closeSocket();
                 break;
@@ -71,8 +77,8 @@ public class Client {
             }
 
             // should restart game?
-            if (response.startsWith("should") 
-            || response.startsWith("would you like to review your answers?")
+            if (response.startsWith("Should") 
+            || response.startsWith("Would you like to review your answers?")
             || response.startsWith("Ask meta AI for an explanation?")) {
                 command = line.nextLine();
                 sendRequest(command);
@@ -119,5 +125,9 @@ public class Client {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    static private void printLineBreak() {
+        System.out.println("---------------------------------------------------------------");
     }
 }

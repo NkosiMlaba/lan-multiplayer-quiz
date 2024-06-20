@@ -94,7 +94,6 @@ public class ClientHandler implements Runnable {
                 sendResponseToQuestion("Wrong");
                 options.add(userAnswer);
             }
-
             map.put(currentQuestion.getExpression(), options);
         }
 
@@ -106,7 +105,7 @@ public class ClientHandler implements Runnable {
         sendResponseToQuestion("For a final percentage score of: " + percentageString + "%");
 
         // would you like to review your answers?
-        sendResponseToQuestion("would you like to review your answers?");
+        sendResponseToQuestion("Would you like to review your answers?");
         String message = "";
 
         message = readRequest();
@@ -115,13 +114,13 @@ public class ClientHandler implements Runnable {
                 
                 sendResponseToQuestion("Question: " + entry.getKey());
                 List<Object> answers = entry.getValue();
-                sendResponseToQuestion("Correct Answer: " + answers.get(0));
-                sendResponseToQuestion("Your Answer: " + answers.get(1));
+                sendResponseToQuestion("The Correct Answer Was: " + answers.get(0));
 
                 if (answers.get(1).equals(answers.get(0))) {
                     continue;
                 } else {
-                    sendResponseToQuestion("Ask meta AI for an explanation?");
+                    sendResponseToQuestion("Your Answer Was: " + answers.get(1));
+                    sendResponseToQuestion("Ask meta AI for an explanation?(yes/no)");
                 }
 
                 message = readRequest();
@@ -144,7 +143,7 @@ public class ClientHandler implements Runnable {
                 sendResponseToQuestion(RunPythonScript.main(new String[] {"Why is " + answers.get(0) + " the answer to " + entry.getKey() + "?"})); //" and not " + answers.get(1) +
             }
         } 
-        sendResponseToQuestion("should we continue the game?");
+        sendResponseToQuestion("Should we continue the game?(yes/no)");
         
         String shouldContinue = getRequestInput();
         System.out.println("answer found");
@@ -169,7 +168,7 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendOptions(List<String> options) {
-        String response = "Options: \n";
+        String response = "Options (e.g. 1): \n";
         int count = 1;
         for (String option : options) {
             response += "    [" + count + "] " + option.strip() + "\n";
@@ -312,11 +311,11 @@ public class ClientHandler implements Runnable {
         return stringList;
     }
 
-    public static int calculatePercentage(int part, int whole) {
+    public static double calculatePercentage(int part, int whole) {
         if (whole == 0) {
             throw new IllegalArgumentException("The whole value cannot be zero.");
         }
-        return (part / whole) * 100;
+        return (part * 100 / whole);
     }
 
 }
