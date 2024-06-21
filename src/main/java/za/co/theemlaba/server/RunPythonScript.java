@@ -30,7 +30,7 @@ public class RunPythonScript {
             String line;
             String paragraph = "";
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                // System.out.println(line);
                 paragraph += line + "\n";
             }
 

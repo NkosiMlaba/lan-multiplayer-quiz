@@ -80,6 +80,7 @@ public class Client {
             if (response.startsWith("Should") 
             || response.startsWith("Would you like to review your answers?")
             || response.startsWith("Ask meta AI for an explanation?")) {
+                // printLineBreak();
                 command = line.nextLine();
                 sendRequest(command);
             }

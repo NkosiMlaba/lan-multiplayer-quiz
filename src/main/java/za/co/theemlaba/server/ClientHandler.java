@@ -146,7 +146,6 @@ public class ClientHandler implements Runnable {
         sendResponseToQuestion("Should we continue the game?(yes/no)");
         
         String shouldContinue = getRequestInput();
-        System.out.println("answer found");
         
         if (shouldContinue.matches("yes")) {
             game();
@@ -159,7 +158,7 @@ public class ClientHandler implements Runnable {
     public void sendQuestion(String question) {
         String response = "What is: ";
         try {
-            dos.writeUTF(response + question);
+            dos.writeUTF(question);
             dos.flush();
             // dos.flush();
         } catch (IOException e) {
