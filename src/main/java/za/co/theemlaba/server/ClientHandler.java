@@ -140,7 +140,7 @@ public class ClientHandler implements Runnable {
                     break;
                 }
 
-                sendResponseToQuestion(RunPythonScript.main(new String[] {"Why is " + answers.get(0) + " the answer to " + entry.getKey() + "?"})); //" and not " + answers.get(1) +
+                sendResponseToQuestion(RunPythonScript.sendRequest(new String[] {"Why is " + answers.get(0) + " the answer to " + entry.getKey() + "?"})); //" and not " + answers.get(1) +
             }
         } 
         sendResponseToQuestion("Should we continue the game?(yes/no)");

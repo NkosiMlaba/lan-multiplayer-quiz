@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 
 public class RunPythonScript {
 
-    public static String main(String[] args) {
+    public static String sendRequest (String[] args) {
         try {
             // Get the current directory
             String currentDir = System.getProperty("user.dir");
@@ -30,24 +30,11 @@ public class RunPythonScript {
             String line;
             String paragraph = "";
             while ((line = reader.readLine()) != null) {
-                // System.out.println(line);
+                System.out.println(line);
                 paragraph += line + "\n";
             }
 
             return paragraph;
-
-            // Read the error stream (if any)
-            // BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            // while ((line = errorReader.readLine()) != null) {
-            //     System.err.println(line);
-            // }
-
-            
-
-
-            // Wait for the process to complete
-            // int exitCode = process.waitFor();
-            // System.out.println("Exited with code: " + exitCode);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,6 +42,11 @@ public class RunPythonScript {
             return "error";
         }
     }
-}
 
+    public static void main(String[] args) {
+        String[] args1 = {"1+1"};
+        String response = sendRequest(args1);
+        System.out.println(response);
+    }
+}
 

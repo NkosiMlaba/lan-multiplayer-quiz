@@ -17,18 +17,24 @@ public class Server {
     static int port = 3000;
 
     public static void main(String[] args) {
-
-        //
         Server serverObject = new Server();
+        printWelcomeMessage(args);
+        startServer(serverObject);
+    }
 
-        {
-            printLineBreak();
-            System.out.println("Server address: " + NetworkInfo.main(args));
-            System.out.println("Port number: " + port + "\n");
-            System.out.println("Server started. Waiting for clients...");
-            printLineBreak();
-        }
+    static private void printLineBreak() {
+        System.out.println("---------------------------------------------------------------");
+    }
 
+    static void printWelcomeMessage(String[] args) {
+        printLineBreak();
+        System.out.println("Server address: " + NetworkInfo.main(args));
+        System.out.println("Port number: " + port + "\n");
+        System.out.println("Server started. Waiting for clients...");
+        printLineBreak();
+    }
+
+    static void startServer(Server serverObject) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server started. Listening for incoming connections...");
             while (true) {
@@ -38,7 +44,6 @@ public class Server {
 
                 // Add client to connections
                 clientConnections.add(clientSocket);
-
                 // Create a new thread for each client
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 serverObject.clients.add(clientHandler);
@@ -49,9 +54,5 @@ public class Server {
         catch (Exception e) {
             System.out.println("Server closed");
         }
-    }
-
-    static private void printLineBreak() {
-        System.out.println("---------------------------------------------------------------");
     }
 }
