@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.ArrayUtils;
 
 import za.co.theemlaba.online.RunPythonScript;
 
@@ -158,7 +156,6 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendQuestion(String question) {
-        String response = "What is: ";
         try {
             dos.writeUTF(question);
             dos.flush();

@@ -3,9 +3,7 @@ package za.co.theemlaba.server;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 
 import za.co.theemlaba.domain.ClientHandler;
 import za.co.theemlaba.networkinfo.NetworkInfo;
