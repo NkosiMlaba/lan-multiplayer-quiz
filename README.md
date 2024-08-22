@@ -6,16 +6,20 @@ This is a simple multiplayer quiz game that can be played over a local area netw
 
 - A linux operating system
 - Java 11 or higher
-- Maven (for dependency management)
+- Maven
 - Access to a terminal that supports ANSI colors and Unicode characters
+
+## Additional requirement:
 - Internet access
+- Groq API key
+
 
 ## Getting Started
 
 1. Clone the repository: `git clone https://github.com/NkosiMlaba/lan-multiplayer-quiz`
 2. Install dependencies: [setup](#setup)
 3. Compile and test the project: [compile](#compiling-and-testing-the-project)
-4. Running instructions: 
+4. Running instructions: [run](#running-the-program)
 
 ## Setup:
 
@@ -56,12 +60,22 @@ This is a simple multiplayer quiz game that can be played over a local area netw
     `create a file called .env in the root directory of the project and add your Groq API key to the file`
 
 ## Compiling and Testing the Project
+1. Navigate to the root directory of the project: `lan-multiplayer-quiz`
+2. Compile the project using: 
+        
+        mvn clean compile
+3. Run the tests using:
+        
+        mvn test
 
-## Running the Server
+## Running the program
+#### Running the Server
 
 1. Navigate to the server directory: `lan-multiplayer-quiz/src/main/java/za/co/theemlaba/server/llama3client.py`
 
-## How to Play
+#### Running the Client
+
+## How to use the program
 
 1. One player will be designated as the host and will create a new game room.
 2. Other players can join the game room by entering the address provided by the host.
@@ -73,10 +87,13 @@ This is a simple multiplayer quiz game that can be played over a local area netw
 
 ## Features
 
-- Multiplayer support over LAN
-- Real-time updates and synchronization
-- Customizable questions and answers
-- Leaderboard and score tracking
+- Multiplayer over LAN
+- Real-time server updates
+- Asking Meta AI for an explanation
+
+## Project Status
+This project is currently in active development.
+![Status](https://img.shields.io/badge/status-in%20progress-yellow)
 
 ## Contributing
 
