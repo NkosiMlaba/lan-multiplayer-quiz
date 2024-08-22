@@ -9,7 +9,7 @@ This is a simple multiplayer quiz game that can be played over a local area netw
 - Maven
 - Access to a terminal that supports ANSI colors and Unicode characters
 
-## Additional requirement:
+## Additional requirements:
 - Internet access
 - Groq API key
 
@@ -68,12 +68,14 @@ This is a simple multiplayer quiz game that can be played over a local area netw
         
         mvn test
 
-## Running the program
+
 #### Running the Server
 
-1. Navigate to the server directory: `lan-multiplayer-quiz/src/main/java/za/co/theemlaba/server/llama3client.py`
+        java -jar target/mysockets-1.0-SNAPSHOT-server-jar-with-dependencies.jar
 
 #### Running the Client
+
+        java -jar target/mysockets-1.0-SNAPSHOT-client-jar-with-dependencies.jar
 
 ## How to use the program
 
