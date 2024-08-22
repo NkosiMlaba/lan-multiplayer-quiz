@@ -1,4 +1,4 @@
-package za.co.theemlaba.server.networkinfo;
+package za.co.theemlaba.networkinfo;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -20,7 +20,6 @@ public class NetworkInfo {
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             for (NetworkInterface iface : Collections.list(interfaces)) {
-                // Filters out 127.0.0.1 and inactive interfaces
                 if (iface.isLoopback() || !iface.isUp())
                     continue;
 

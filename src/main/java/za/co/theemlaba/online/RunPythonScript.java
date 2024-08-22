@@ -1,4 +1,4 @@
-package za.co.theemlaba.server;
+package za.co.theemlaba.online;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-package za.co.theemlaba.server;
+package za.co.theemlaba.domain;
 
 import java.io.*;
 import java.net.*;
@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
+
+import za.co.theemlaba.online.RunPythonScript;
 
 public class ClientHandler implements Runnable {
     final Socket clientSocket;
@@ -290,7 +292,7 @@ public class ClientHandler implements Runnable {
         String directoryPath = "";
         try {
             String path = new File(ClientHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-            String otherFilePath = "/../src/main/java/za/co/theemlaba/server/"; // src/main/java/za/co/theemlaba/server/questions.csv
+            String otherFilePath = "/../src/main/java/za/co/theemlaba/database/"; // src/main/java/za/co/theemlaba/server/questions.csv
             directoryPath = new File(path).getParent() + otherFilePath + QUESTIONS_FILE;
         } catch (Exception e) {
             e.printStackTrace();

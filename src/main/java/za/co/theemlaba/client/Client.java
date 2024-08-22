@@ -9,88 +9,26 @@ import java.util.regex.Pattern;
 
 public class Client {
     static String address = "20.20.15.94";
-    private static final int COUNTDOWN_DURATION = 2; // Countdown duration in seconds
+    private static final int COUNTDOWN_DURATION = 2;
     static Scanner line = new Scanner(System.in);
-    // initailising variables;
     static Socket sThisClient = null;
     static DataOutputStream dout = null;
     static DataInputStream din = null;
 
     public static void main(String[] args) {
-        
-        
-        
-        // try to connect to server
-        // can be made into a function
-        try {
-            address = "localhost";
-            sThisClient = new Socket(address, 3000);
-            dout = new DataOutputStream(sThisClient.getOutputStream());
-            din = new DataInputStream(sThisClient.getInputStream());
-        }
-        catch (Exception e) {
-                System.out.println(e);
-            }
+        // connect to server
+        connectToServer();
         
         // start game flag 
-        String command;
-        System.out.println("Connected to server.");
-        while (true) {
-            System.out.println("Type 'start' to begin the game: ");
-            command = line.nextLine();
-            if (Pattern.matches("(?i)start", command)) {
-                break;
-            }
-        }
-
-        // count down
-        System.out.println("Starting the game in...");
-        for (int i = COUNTDOWN_DURATION; i > 0; i--) {
-            System.out.println(i + "...");
-            sleep(1000);
-        }
-        printLineBreak();
+        String command = "";
+        command = promptForStart();
+        printCountDown();
         
-        // send start game
+        // send start game request
         sendRequest(command);
 
-        // receive responses and send requests
-        while (true) {
-            String response = readResponse();
-            System.out.println(response);
-
-            // close from server
-            if (response.startsWith("Correct") || response.startsWith("Wrong") ||
-            response.startsWith("For a final")) {
-                printLineBreak();
-            }
-            
-            if (response.startsWith("close")) {
-                closeSocket();
-                break;
-            }
-
-            // for a question
-            if (response.startsWith("Options")) {
-                command = line.nextLine();
-                sendRequest(command);
-            }
-
-            // should restart game?
-            if (response.startsWith("Should") 
-            || response.startsWith("Would you like to review your answers?")
-            || response.startsWith("Ask meta AI for an explanation?")) {
-                // printLineBreak();
-                command = line.nextLine();
-                sendRequest(command);
-            }
-
-            
-
-            if (command.matches("quit")){
-                break;
-            }
-        }
+        // run application loop
+        runApplicationLoop();
     }
 
     static public void closeSocket() {
@@ -130,5 +68,80 @@ public class Client {
 
     static private void printLineBreak() {
         System.out.println("---------------------------------------------------------------");
+    }
+
+    static public void connectToServer() {
+    try {
+        address = "localhost";
+        sThisClient = new Socket(address, 3000);
+        dout = new DataOutputStream(sThisClient.getOutputStream());
+        din = new DataInputStream(sThisClient.getInputStream());
+    }
+    catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    static public String promptForStart () {
+        System.out.println("Connected to server.");
+        while (true) {
+            System.out.println("Type 'start' to begin the game: ");
+            String command = line.nextLine();
+            if (Pattern.matches("(?i)start", command)) {
+                return command;
+            } else if (Pattern.matches("(?i)quit", command)) {
+                System.out.println("Shutting down");
+                System.exit(0);
+            }
+            System.out.println("Invalid input. Please try again.");
+        }
+    }
+
+    static public void printCountDown () {
+        // count down
+        System.out.println("Starting the game in...");
+        for (int i = COUNTDOWN_DURATION; i > 0; i--) {
+            System.out.println(i + "...");
+            sleep(1000);
+        }
+        printLineBreak();
+    }
+
+    static public void runApplicationLoop () {
+        // receive responses and send requests
+        String command = "";
+        while (true) {
+            String response = readResponse();
+            System.out.println(response);
+
+            // close from server
+            if (response.startsWith("Correct") || response.startsWith("Wrong") ||
+            response.startsWith("For a final")) {
+                printLineBreak();
+            }
+            
+            if (response.startsWith("close")) {
+                closeSocket();
+                break;
+            }
+
+            // for a question
+            if (response.startsWith("Options")) {
+                command = line.nextLine();
+                sendRequest(command);
+            }
+
+            // should restart game?
+            if (response.startsWith("Should") 
+            || response.startsWith("Would you like to review your answers?")
+            || response.startsWith("Ask meta AI for an explanation?")) {
+                command = line.nextLine();
+                sendRequest(command);
+            }
+
+            if (command.matches("quit")){
+                break;
+            }
+        }
     }
 }

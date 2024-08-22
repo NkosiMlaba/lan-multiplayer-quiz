@@ -1,6 +1,6 @@
 # LAN Multiplayer Quiz
 
-This is a simple multiplayer quiz game that can be played over a local area network (LAN). The game is built using Java core and Socket.IO.
+This is a simple multiplayer quiz game that can be played over a local area network (LAN). The application is built using Java core and SocketIO.
 
 ## System Requirements:
 
@@ -10,7 +10,14 @@ This is a simple multiplayer quiz game that can be played over a local area netw
 - Access to a terminal that supports ANSI colors and Unicode characters
 - Internet access
 
-### Setup:
+## Getting Started
+
+1. Clone the repository: `git clone https://github.com/NkosiMlaba/lan-multiplayer-quiz`
+2. Install dependencies: [setup](#setup)
+3. Compile and test the project: [compile](#compiling-and-testing-the-project)
+4. Running instructions: 
+
+## Setup:
 
 1. On a linux machine, connect to the internet and run:
         
@@ -32,7 +39,7 @@ This is a simple multiplayer quiz game that can be played over a local area netw
         
         java -version
 
-### Additional Setup Instructions (If intending to host the Server):
+#### Additional Setup Instructions (If intending to host the Server):
 1. Install python:
 
         sudo apt install python3
@@ -46,15 +53,9 @@ This is a simple multiplayer quiz game that can be played over a local area netw
         pip install groq
 
 4. Insert your Groq API key:
-    Replace: `"<KEY>" with your own Groq API key in the llama3client.py file.`
-    Location of file: `lan-multiplayer-quiz/src/main/java/za/co/theemlaba/server/llama3client.py`
+    `create a file called .env in the root directory of the project and add your Groq API key to the file`
 
-## Getting Started
-
-1. Clone the repository: `git clone https://github.com/NkosiMlaba/lan-multiplayer-quiz`
-2. Install dependencies: ` install`
-3. Start the server: `node server.js`
-4. Open multiple browser windows or tabs and navigate to `http://localhost:3000` to join the game.
+## Compiling and Testing the Project
 
 ## Running the Server
 
@@ -87,4 +88,4 @@ Nkosikhona Mlaba (nkosimlaba397@gmail.com)
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the MIT License.

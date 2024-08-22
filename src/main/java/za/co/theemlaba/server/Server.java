@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-import za.co.theemlaba.server.networkinfo.NetworkInfo;
+import za.co.theemlaba.domain.ClientHandler;
+import za.co.theemlaba.networkinfo.NetworkInfo;
 
 public class Server {
 
