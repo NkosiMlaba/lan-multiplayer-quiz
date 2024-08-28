@@ -2,6 +2,10 @@
 
 This is a simple multiplayer quiz game that can be played over a local area network (LAN). The application is built using Java core and SocketIO.
 
+## Project Status
+This project is currently in active development.
+![Status](https://img.shields.io/badge/status-in%20progress-yellow)
+
 ## System Requirements:
 
 - A linux operating system
@@ -92,10 +96,6 @@ This is a simple multiplayer quiz game that can be played over a local area netw
 - Multiplayer over LAN
 - Real-time server updates
 - Asking Meta AI for an explanation
-
-## Project Status
-This project is currently in active development.
-![Status](https://img.shields.io/badge/status-in%20progress-yellow)
 
 ## Contributing
 
