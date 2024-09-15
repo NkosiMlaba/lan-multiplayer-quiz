@@ -1,4 +1,4 @@
-package za.co.theemlaba.networkinfo;
+package za.co.theemlaba.server.networkinfo;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

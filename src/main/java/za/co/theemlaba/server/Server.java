@@ -5,8 +5,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import za.co.theemlaba.domain.ClientHandler;
-import za.co.theemlaba.networkinfo.NetworkInfo;
+import za.co.theemlaba.server.networkinfo.NetworkInfo;
 
 public class Server {
 

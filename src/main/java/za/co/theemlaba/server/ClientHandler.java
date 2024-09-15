@@ -1,4 +1,4 @@
-package za.co.theemlaba.domain;
+package za.co.theemlaba.server;
 
 import java.io.*;
 import java.net.*;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import za.co.theemlaba.online.RunPythonScript;
+import za.co.theemlaba.server.online.RunPythonScript;
 
 public class ClientHandler implements Runnable {
     final Socket clientSocket;
@@ -138,9 +138,11 @@ public class ClientHandler implements Runnable {
 
                 if (!message.equalsIgnoreCase("yes")) {
                     break;
-                }
+                }   
 
-                sendResponseToQuestion(RunPythonScript.sendRequest(new String[] {"Why is " + answers.get(0) + " the answer to " + entry.getKey() + "?"})); //" and not " + answers.get(1) +
+                // + entry.getKey().toString() + "?"
+                String prompt = "Why is " + answers.get(0).toString() + " the answer to '" + entry.getKey().toString() + "'?";
+                sendResponseToQuestion(RunPythonScript.sendRequest(new String[] {prompt}));
             }
         } 
         sendResponseToQuestion("Should we continue the game?(yes/no)");

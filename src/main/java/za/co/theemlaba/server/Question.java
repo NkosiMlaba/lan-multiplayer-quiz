@@ -1,4 +1,4 @@
-package za.co.theemlaba.domain;
+package za.co.theemlaba.server;
 
 public class Question {
     private String expression;

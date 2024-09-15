@@ -48,19 +48,11 @@ This project is currently in active development.
         java -version
 
 #### Additional Setup Instructions (If intending to host the Server):
-1. Install python:
-
-        sudo apt install python3
-
-2. Verify the Installation:
-
-        python3 --version
-
-3. Install Groq python library:
+1. Install Groq python library:
 
         pip install groq
 
-4. Insert your Groq API key:
+2. Insert your Groq API key:
     `create a file called .env in the root directory of the project and add your Groq API key to the file`
 
 ## Compiling and Testing the Project
