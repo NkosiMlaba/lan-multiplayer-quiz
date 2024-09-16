@@ -99,10 +99,10 @@ public class Client {
     static public void printCountDown () {
         // count down
         System.out.println("Starting the game in...");
-        for (int i = COUNTDOWN_DURATION; i > 0; i--) {
-            System.out.println(i + "...");
-            sleep(1000);
-        }
+        // for (int i = COUNTDOWN_DURATION; i > 0; i--) {
+        //     System.out.println(i + "...");
+        //     sleep(1000);
+        // }
         printLineBreak();
     }
 

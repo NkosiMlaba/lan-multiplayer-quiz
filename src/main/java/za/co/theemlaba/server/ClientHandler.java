@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 import za.co.theemlaba.server.online.RunPythonScript;
+import za.co.theemlaba.server.login.*;
+
 
 public class ClientHandler implements Runnable {
     final Socket clientSocket;
@@ -19,6 +21,8 @@ public class ClientHandler implements Runnable {
     String clientIdentifier;
     Scanner commandLine;
     String regexCaseInsetitiveString = "(?i)";
+    Login loginManager = new Login();
+    boolean quitFlag = false;
 
     private static final String QUESTIONS_FILE = "questions.csv";
     List<Question> questions = readQuestionsFromCSV();
@@ -38,29 +42,24 @@ public class ClientHandler implements Runnable {
         while (true) {
             message = readRequest();
 
-            if (message.equalsIgnoreCase("already disconnected")) {
-                return;
-            }
-            
-            if (message.equalsIgnoreCase("quit")) {
+            if (quitFlag) {
                 sendMessage("Thank you for playing. Goodbye.");
                 sendCloseFlag();
                 disconnectClient();
                 return;
-            }
-
-            if (message.equalsIgnoreCase("start")) {
+            } else if (message.equalsIgnoreCase("start")) {
                 break;
             }
         }
-        
-
-        game();
+        // game();
+        loginManager.startLogin(this);
     }
 
     private String getClientIdentifier(Socket clientSocket) {
         return clientSocket.getInetAddress().getHostAddress(); // Using client's IP address as identifier
     }
+
+    
 
     public void game() {
         int score = 0;
@@ -174,20 +173,13 @@ public class ClientHandler implements Runnable {
             response += "    [" + count + "] " + option.strip() + "\n";
             count++;
         }
-        try {
-            dos.writeUTF(response);
-            dos.flush();
-            // dos.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendMessage(response);
     }
 
     public void sendMessage(String message) {
         try {
             dos.writeUTF(message);
             dos.flush();
-            // dos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -195,7 +187,6 @@ public class ClientHandler implements Runnable {
 
     public String getRequestInput() {
         String message = "";
-
         try {
             message = dis.readUTF().strip();
             System.out.println("Client " + clientIdentifier + " says: " + message);
@@ -257,12 +248,13 @@ public class ClientHandler implements Runnable {
         String message = "";
         try {
             message = dis.readUTF();
-        } catch (IOException e) {
+        } catch (Exception e) {
             message = "already disconnected";
             System.out.println("Client " + clientIdentifier + " premetruely closed the connection.");
-            // e.printStackTrace();
+            quitFlag = true;
         }
 
+        quitFlag = message.equalsIgnoreCase("quit") ? true : false;
         return message;
     }
 
