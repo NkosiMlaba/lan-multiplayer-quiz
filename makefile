@@ -78,3 +78,11 @@ run-server:
 .PHONY: run-client
 run-client: 
 	java -jar $(CLIENT_JAR_FILE)
+
+# Target to automate pushing to github
+.PHONY: push
+push:
+	@read -p "Enter commit message: " msg; \
+	git add .; \
+	git commit -m "$$msg"; \
+	git push
