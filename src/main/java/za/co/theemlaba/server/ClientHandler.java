@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 import za.co.theemlaba.server.online.RunPythonScript;
-import za.co.theemlaba.server.login.*;
 
 
 public class ClientHandler implements Runnable {
@@ -21,7 +20,6 @@ public class ClientHandler implements Runnable {
     String clientIdentifier;
     Scanner commandLine;
     String regexCaseInsetitiveString = "(?i)";
-    Login loginManager = new Login();
     boolean quitFlag = false;
 
     private static final String QUESTIONS_FILE = "questions.csv";
@@ -51,8 +49,7 @@ public class ClientHandler implements Runnable {
                 break;
             }
         }
-        // game();
-        loginManager.startLogin(this);
+        game();
     }
 
     private String getClientIdentifier(Socket clientSocket) {
@@ -138,10 +135,9 @@ public class ClientHandler implements Runnable {
                 if (!message.equalsIgnoreCase("yes")) {
                     break;
                 }   
-
-                // + entry.getKey().toString() + "?"
-                String prompt = "Why is " + answers.get(0).toString() + " the answer to '" + entry.getKey().toString() + "'?";
-                sendResponseToQuestion(RunPythonScript.sendRequest(new String[] {prompt}));
+                String prompt = "Why is " + answers.get(0).toString() + " the answer to '" + entry.getKey().replace("\"", "").toString() + "'?";
+                String result = RunPythonScript.sendRequest(new String[] {prompt});
+                sendResponseToQuestion(result);
             }
         } 
         sendResponseToQuestion("Should we continue the game?(yes/no)");
@@ -283,7 +279,7 @@ public class ClientHandler implements Runnable {
         String directoryPath = "";
         try {
             String path = new File(ClientHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-            String otherFilePath = "/../src/main/java/za/co/theemlaba/database/"; // src/main/java/za/co/theemlaba/server/questions.csv
+            String otherFilePath = "/../src/main/java/za/co/theemlaba/server/questions/"; // src/main/java/za/co/theemlaba/server/questions.csv
             directoryPath = new File(path).getParent() + otherFilePath + QUESTIONS_FILE;
         } catch (Exception e) {
             e.printStackTrace();
