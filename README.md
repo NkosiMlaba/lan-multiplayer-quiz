@@ -67,11 +67,11 @@ This project is currently in active development.
 
 #### Running the Server
 
-        java -jar target/mysockets-1.0-SNAPSHOT-server-jar-with-dependencies.jar
+        make server
 
 #### Running the Client
 
-        java -jar target/mysockets-1.0-SNAPSHOT-client-jar-with-dependencies.jar
+        make client
 
 ## How to use the program
 

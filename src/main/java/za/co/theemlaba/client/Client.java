@@ -8,22 +8,18 @@ import java.util.regex.Pattern;
 
 public class Client {
     static String address = "20.20.15.94";
-    private static final int COUNTDOWN_DURATION = 2;
     static Scanner line = new Scanner(System.in);
     static Socket sThisClient = null;
     static DataOutputStream dout = null;
     static DataInputStream din = null;
 
     public static void main(String[] args) {
-        // connect to server
         connectToServer();
         
         // start game flag 
         String command = "";
         command = promptForStart();
         printCountDown();
-        
-        // send start game request
         sendRequest(command);
 
         // run application loop
@@ -97,12 +93,7 @@ public class Client {
     }
 
     static public void printCountDown () {
-        // count down
-        System.out.println("Starting the game in...");
-        // for (int i = COUNTDOWN_DURATION; i > 0; i--) {
-        //     System.out.println(i + "...");
-        //     sleep(1000);
-        // }
+        System.out.println("Starting the game...");
         printLineBreak();
     }
 
