@@ -2,9 +2,8 @@
 
 This is a simple multiplayer quiz game that can be played over a local area network (LAN). The application is built using Java core and SocketIO.
 
-## Project Status
+## Project Status: ![Status](https://img.shields.io/badge/status-in%20progress-yellow)
 This project is currently in active development.
-![Status](https://img.shields.io/badge/status-in%20progress-yellow)
 
 ## System Requirements:
 
@@ -48,11 +47,7 @@ This project is currently in active development.
         java -version
 
 #### Additional Setup Instructions (If intending to host the Server):
-1. Install Groq python library:
-
-        pip install groq
-
-2. Insert your Groq API key:
+1. Insert your Groq API key:
     `create a file called .env in the root directory of the project and add your Groq API key to the file`
 
 ## Compiling and Testing the Project
