@@ -42,7 +42,7 @@ public class Llama3Request {
                 .asJson();
     }
 
-    String makeJsonString (String promptString) {
+    public String makeJsonString (String promptString) {
         return "{" +
                 "\"messages\": [{" +
                 "\"role\":\"user\"," +

@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 public class RunPythonScript {
     public static String sendRequest (String[] args) {
         try {
-            
             String paragraph = Llama3Request.main(args);
             return paragraph;
         } catch (Exception e) {

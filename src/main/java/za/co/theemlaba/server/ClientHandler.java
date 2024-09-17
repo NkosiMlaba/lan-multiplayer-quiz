@@ -53,10 +53,8 @@ public class ClientHandler implements Runnable {
     }
 
     private String getClientIdentifier(Socket clientSocket) {
-        return clientSocket.getInetAddress().getHostAddress(); // Using client's IP address as identifier
+        return clientSocket.getInetAddress().getHostAddress();
     }
-
-    
 
     public void game() {
         int score = 0;
@@ -279,7 +277,7 @@ public class ClientHandler implements Runnable {
         String directoryPath = "";
         try {
             String path = new File(ClientHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-            String otherFilePath = "/../src/main/java/za/co/theemlaba/server/questions/"; // src/main/java/za/co/theemlaba/server/questions.csv
+            String otherFilePath = "/../src/main/java/za/co/theemlaba/server/questions/";
             directoryPath = new File(path).getParent() + otherFilePath + QUESTIONS_FILE;
         } catch (Exception e) {
             e.printStackTrace();
