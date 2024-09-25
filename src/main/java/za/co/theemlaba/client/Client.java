@@ -21,8 +21,6 @@ public class Client {
         command = promptForStart();
         printCountDown();
         sendRequest(command);
-
-        // run application loop
         runApplicationLoop();
     }
 
@@ -66,14 +64,15 @@ public class Client {
     }
 
     static public void connectToServer() {
-    try {
-        address = "localhost";
-        sThisClient = new Socket(address, 3000);
-        dout = new DataOutputStream(sThisClient.getOutputStream());
-        din = new DataInputStream(sThisClient.getInputStream());
-    }
-    catch (Exception e) {
-            System.out.println(e);
+        try {
+            address = "localhost";
+            sThisClient = new Socket(address, 3000);
+            dout = new DataOutputStream(sThisClient.getOutputStream());
+            din = new DataInputStream(sThisClient.getInputStream());
+        }
+        catch (Exception e) {
+            System.out.println("Server not started properly, exiting...");
+            System.exit(0);
         }
     }
 
@@ -105,26 +104,26 @@ public class Client {
             System.out.println(response);
 
             // close from server
-            if (response.startsWith("Correct") || response.startsWith("Wrong") ||
+            if (response.toLowerCase().startsWith("correct") || response.toLowerCase().startsWith("wrong") ||
             response.startsWith("For a final")) {
                 printLineBreak();
             }
             
-            if (response.startsWith("close")) {
+            if (response.equalsIgnoreCase("close") || response.equalsIgnoreCase("quit")) {
                 closeSocket();
                 break;
             }
 
             // for a question
-            if (response.startsWith("Options")) {
+            if (response.toLowerCase().startsWith("options")) {
                 command = line.nextLine();
                 sendRequest(command);
             }
 
             // should restart game?
-            if (response.startsWith("Should") 
-            || response.startsWith("Would you like to review your answers?")
-            || response.startsWith("Ask meta AI for an explanation?")) {
+            if (response.toLowerCase().startsWith("should") 
+            || response.toLowerCase().startsWith("would you")
+            || response.toLowerCase().startsWith("ask meta AI for an explanation?")) {
                 command = line.nextLine();
                 sendRequest(command);
             }

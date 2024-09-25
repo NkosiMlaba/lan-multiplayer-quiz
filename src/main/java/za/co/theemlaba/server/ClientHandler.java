@@ -22,10 +22,13 @@ public class ClientHandler implements Runnable {
     String regexCaseInsetitiveString = "(?i)";
     boolean quitFlag = false;
 
+    // game
+    int score = 0;
+    Map<String, List<Object>> map = new HashMap<>();
+
     private static final String QUESTIONS_FILE = "questions.csv";
     List<Question> questions = readQuestionsFromCSV();
 
-    // constructor
     public ClientHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
     }
@@ -49,6 +52,7 @@ public class ClientHandler implements Runnable {
                 break;
             }
         }
+        // getCategory();
         game();
     }
 
@@ -57,9 +61,27 @@ public class ClientHandler implements Runnable {
     }
 
     public void game() {
-        int score = 0;
-        Map<String, List<Object>> map = new HashMap<>();
         Collections.shuffle(questions);
+        resetValues();
+        sendEachQuestion();
+        sendResponseToQuestion("Game over");
+        finaliseScore();
+        
+        if (sendReviewAnswersPrompt().equalsIgnoreCase("yes")) {
+            reviewAnswers();
+        }
+        
+        if (sendContinueGamePrompt().equalsIgnoreCase("yes")) {
+            game();
+        } 
+        
+        sendCloseFlag();
+        disconnectClient();
+        
+    }
+
+    public void sendEachQuestion () {
+        Map<String, List<Object>> map = new HashMap<>();
         for (Question currentQuestion : questions) {
             sendQuestion(currentQuestion.getExpression());
             String[] optionsGiven = currentQuestion.getPotentialAnswers();
@@ -90,65 +112,67 @@ public class ClientHandler implements Runnable {
             }
             map.put(currentQuestion.getExpression(), options);
         }
+    }
 
-        sendResponseToQuestion("Game over");
-        
+    public void finaliseScore () {
         String str = String.valueOf(score);
         sendResponseToQuestion("Your final score is: " + str + " out of " + String.valueOf(questions.size()));
         String percentageString = String.valueOf(calculatePercentage(score, questions.size()));
         sendResponseToQuestion("For a final percentage score of: " + percentageString + "%");
+    }
 
+    public String sendReviewAnswersPrompt () {
         // would you like to review your answers?
-        sendResponseToQuestion("Would you like to review your answers?");
+        // would you like to review your answers?
+        sendMessage("Would you like to review your answers? (yes/no)");
         String message = "";
-
         message = readRequest();
-        if (message.matches("yes")) {
-            for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
-                
-                sendResponseToQuestion("Question: " + entry.getKey());
-                List<Object> answers = entry.getValue();
-                sendResponseToQuestion("The Correct Answer Was: " + answers.get(0));
+        return message;
+    }
 
-                if (answers.get(1).equals(answers.get(0))) {
-                    continue;
-                } else {
-                    sendResponseToQuestion("Your Answer Was: " + answers.get(1));
-                    sendResponseToQuestion("Ask meta AI for an explanation?(yes/no)");
-                }
-
-                message = readRequest();
+    public void reviewAnswers () {
+        String message = "";
+        for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
                 
-                if (message.equalsIgnoreCase("already disconnected")) {
-                    return;
-                }
-                
-                if (message.equalsIgnoreCase("quit")) {
-                    sendMessage("Thank you for playing. Goodbye.");
-                    sendCloseFlag();
-                    disconnectClient();
-                    return;
-                }
+            sendResponseToQuestion("Question: " + entry.getKey());
+            List<Object> answers = entry.getValue();
+            sendResponseToQuestion("The Correct Answer Was: " + answers.get(0));
 
-                if (!message.equalsIgnoreCase("yes")) {
-                    break;
-                }   
-                String prompt = "Why is " + answers.get(0).toString() + " the answer to '" + entry.getKey().replace("\"", "").toString() + "'?";
-                String result = RunPythonScript.sendRequest(new String[] {prompt});
-                sendResponseToQuestion(result);
+            if (answers.get(1).equals(answers.get(0))) {
+                continue;
+            } else {
+                sendResponseToQuestion("Your Answer Was: " + answers.get(1));
+                sendResponseToQuestion("Ask meta AI for an explanation?(yes/no)");
             }
-        } 
-        sendResponseToQuestion("Should we continue the game?(yes/no)");
-        
-        String shouldContinue = getRequestInput();
-        
-        if (shouldContinue.matches("yes")) {
-            game();
-        } else {
-            sendCloseFlag();
-            disconnectClient();
+
+            message = readRequest();
+            
+            if (message.equalsIgnoreCase("already disconnected")) {
+                return;
+            }
+            
+            if (message.equalsIgnoreCase("quit")) {
+                sendMessage("Thank you for playing. Goodbye.");
+                sendCloseFlag();
+                disconnectClient();
+                return;
+            }
+
+            if (!message.equalsIgnoreCase("yes")) {
+                break;
+            }   
+            String prompt = "Why is " + answers.get(0).toString() + " the answer to '" + entry.getKey().replace("\"", "").toString() + "'?";
+            String result = RunPythonScript.sendRequest(new String[] {prompt});
+            sendResponseToQuestion(result);
         }
     }
+
+    public String sendContinueGamePrompt () {
+        sendMessage("Would you like to continue the game? (yes/no)");
+        String message = "";
+        message = getRequestInput();
+        return message;
+    } 
 
     public void sendQuestion(String question) {
         try {
@@ -302,6 +326,11 @@ public class ClientHandler implements Runnable {
             throw new IllegalArgumentException("The whole value cannot be zero.");
         }
         return (part * 100 / whole);
+    }
+
+    public void resetValues() {
+        score = 0;
+        map.clear();
     }
 
 }

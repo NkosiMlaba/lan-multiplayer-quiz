@@ -36,13 +36,9 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server started. Listening for incoming connections...");
             while (true) {
-                // Accepting clients
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Incoming connection accepted");
-
-                // Add client to connections
                 clientConnections.add(clientSocket);
-                // Create a new thread for each client
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 serverObject.clients.add(clientHandler);
                 Thread clientThread = new Thread(clientHandler);
