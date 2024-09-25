@@ -1,4 +1,4 @@
-package za.co.theemlaba.server;
+package za.co.theemlaba.server.question;
 
 public class Question {
     private String expression;
@@ -11,14 +11,29 @@ public class Question {
         this.potentialAnswers = potentialAnswers;
     }
 
+    /**
+     * Returns the expression associated with this question.
+     *
+     * @return the expression for this question
+     */
     public String getExpression() {
         return expression;
     }
-
+    
+    /**
+     * Returns the correct answer for this question.
+     *
+     * @return the correct answer for this question
+     */
     public String getCorrectAnswer() {
         return answer;
     }
-
+    
+    /**
+     * Returns the potential answers for this question.
+     *
+     * @return the potential answers for this question
+     */
     public String[] getPotentialAnswers() {
         return potentialAnswers;
     }

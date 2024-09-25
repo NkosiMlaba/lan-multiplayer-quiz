@@ -7,6 +7,13 @@ import io.github.cdimascio.dotenv.Dotenv;
 import kong.unirest.json.JSONObject;
 
 public class Llama3Request {
+    /**
+     * Sends a GROQ request to the OpenAI API and returns the response content.
+     *
+     * @param args The command-line arguments, where the first argument is the prompt to send to the GROQ API.
+     * @return The response content from the GROQ API.
+     * @throws IllegalStateException if the GROQ_API_KEY environment variable is not set.
+     */
     public static String main(String[] args) {
         Dotenv dotenv = Dotenv.configure().load();
         String apiKey = dotenv.get("GROQ_API_KEY");
@@ -26,7 +33,14 @@ public class Llama3Request {
         String content = choicesObject.getString("content");
         return content;
     }
-
+    
+    /**
+     * Sends a GROQ request to the OpenAI API and returns the HTTP response.
+     *
+     * @param launchString The JSON string containing the request payload.
+     * @param apiKey The GROQ API key.
+     * @return The HTTP response from the GROQ API.
+     */
     public HttpResponse<JsonNode> sendGroqRequest(String launchString, String apiKey) {
         return Unirest.post("https://api.groq.com/openai/v1/chat/completions")
                 .header("Content-Type", "application/json")
@@ -34,8 +48,14 @@ public class Llama3Request {
                 .body(launchString)
                 .asJson();
     }
-
-    public String makeJsonString (String promptString) {
+    
+    /**
+     * Constructs a JSON string containing the prompt to be sent to the GROQ API.
+     *
+     * @param promptString The prompt to be sent to the GROQ API.
+     * @return The JSON string containing the request payload.
+     */
+    public String makeJsonString(String promptString) {
         return "{" +
                 "\"messages\": [{" +
                 "\"role\":\"user\"," +

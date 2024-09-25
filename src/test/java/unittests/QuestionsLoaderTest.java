@@ -8,7 +8,7 @@ class QuestionsLoaderTest {
 
     @Test
     void testConstructorWithValidDatabaseUrl() {
-        String validUrl = "jdbc:postgresql://localhost:5432/testdb";
+        String validUrl = "jdbc:sqlite:src/main/resources/database/questions.db";
         QuestionsLoader loader = new QuestionsLoader(validUrl);
         assertNotNull(loader);
         assertEquals(validUrl, loader.getDatabaseUrl());

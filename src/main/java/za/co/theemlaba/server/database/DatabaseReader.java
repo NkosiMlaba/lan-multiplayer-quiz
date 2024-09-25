@@ -8,8 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import za.co.theemlaba.server.Question;
-
+import za.co.theemlaba.server.question.Question;
 
 public class DatabaseReader {
 
@@ -19,6 +18,12 @@ public class DatabaseReader {
         this.databaseUrl = databaseUrl;
     }
 
+    /**
+     * Retrieves a list of question categories from the database.
+     *
+     *
+     * @return a list of strings representing the question categories in the database
+     */
     public List<String> getQuestionCategories() {
         List<String> categories = new ArrayList<>();
         String sql = "SELECT name FROM sqlite_master WHERE type='table';";
@@ -37,6 +42,12 @@ public class DatabaseReader {
         return categories;
     }
 
+    /**
+     * Retrieves a list of questions from the database for the specified category.
+     *
+     * @param category the name of the category to retrieve questions for
+     * @return a list of objects representing the questions in the specified category
+     */
     public List<Question> getQuestionsFromCategory(String category) {
         List<Question> questions = new ArrayList<>();
         String sql = "SELECT question, answer, options FROM " + category + ";";
@@ -60,6 +71,9 @@ public class DatabaseReader {
         return questions;
     }
 
+    /**
+     * Main method for loading questions from csv files
+     */
     public static void main(String[] args) {
         DatabaseReader reader = new DatabaseReader("jdbc:sqlite:src/main/resources/database/questions.db");
         List<String> categories = reader.getQuestionCategories();

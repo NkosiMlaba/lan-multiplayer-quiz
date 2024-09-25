@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import za.co.theemlaba.server.database.DatabaseReader;
 import za.co.theemlaba.server.online.RunLlamaScript;
+import za.co.theemlaba.server.question.Question;
 
 public class ClientHandler implements Runnable {
     final Socket clientSocket;
@@ -31,6 +32,9 @@ public class ClientHandler implements Runnable {
         this.clientSocket = clientSocket;
     }
 
+    /**
+     * This method runs the game logic for the client.
+     */
     @Override
     public void run() {
 
@@ -54,6 +58,9 @@ public class ClientHandler implements Runnable {
         game();
     }
     
+    /**
+     * This method retrieves the category chosen by the client and retrieves the questions for that category.
+     */
     public void getCategory() {
         List<String> categories = reader.getQuestionCategories();
         sendMessage("Choose a category:");
@@ -79,7 +86,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
+    /**
+     * This method maps the category names to their corresponding indices.
+     *
+     * @param categories The list of category names.
+     * @return A map where the keys are the indices and the values are the category names.
+     */
     public Map<Integer, String> mapCategoryToNumber (List<String> categories) {
         Map<Integer, String> map = new HashMap<>();
         for (int i = 0; i < categories.size(); i++) {
@@ -88,10 +100,14 @@ public class ClientHandler implements Runnable {
         return map;
     }
 
+
     private String getClientIdentifier(Socket clientSocket) {
         return clientSocket.getInetAddress().getHostAddress();
     }
 
+    /**
+     * Main game loop where questions are asked and answered.
+     */
     public void game() {
         resetValues();
         
@@ -114,6 +130,9 @@ public class ClientHandler implements Runnable {
         
     }
 
+    /**
+     * Sends each question to the client, processes the response, and tracks scores.
+     */
     public void sendEachQuestion () {
         int count = 0;
         for (Question currentQuestion : questions) {
@@ -147,12 +166,14 @@ public class ClientHandler implements Runnable {
                 sendResponseToQuestion("Wrong");
                 options.add(userAnswer);
             }
-
             reviewQuestionsMap.put(count, options);
             
         }
     }
 
+    /**
+     * Finalizes and displays the user's score at the end of the game.
+     */
     public void finaliseScore () {
         String str = String.valueOf(score);
         sendResponseToQuestion("Your final score is: " + str + " out of " + String.valueOf(questions.size()));
@@ -160,15 +181,21 @@ public class ClientHandler implements Runnable {
         sendResponseToQuestion("For a final percentage score of: " + percentageString + "%");
     }
 
+    /**
+     * Prompts the user to review their answers.
+     *
+     * @return The user's response.
+     */
     public String sendReviewAnswersPrompt () {
-        // would you like to review your answers?
-        // would you like to review your answers?
         sendMessage("Would you like to review your answers? (yes/no)");
         String message = "";
         message = readRequest();
         return message;
     }
 
+    /**
+     * Displays the user's answers alongside the correct answers.
+     */
     public void reviewAnswers () {
         for (Map.Entry<Integer, List<Object>> entry : reviewQuestionsMap.entrySet()) {
             List<Object> answers = entry.getValue();
@@ -186,6 +213,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Prompts the user to continue the game.
+     *
+     * @return The user's response.
+     */
     public String sendContinueGamePrompt () {
         sendMessage("Would you like to continue the game? (yes/no)");
         String message = "";
@@ -193,6 +225,11 @@ public class ClientHandler implements Runnable {
         return message;
     } 
 
+    /**
+     * Sends a question to the client.
+     *
+     * @param question The question text to be sent.
+     */
     public void sendQuestion(String question) {
         try {
             dos.writeUTF(question);
@@ -203,6 +240,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Sends a list of options to the client.
+     *
+     * @param options The list of options to be sent.
+     */
     public void sendOptions(List<String> options) {
         String response = "Options (e.g. 1): \n";
         int count = 1;
@@ -213,6 +255,11 @@ public class ClientHandler implements Runnable {
         sendMessage(response);
     }
 
+    /**
+     * Sends a message to the client.
+     *
+     * @param message The message text to be sent.
+     */
     public void sendMessage(String message) {
         try {
             dos.writeUTF(message);
@@ -222,6 +269,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Retrieves input from the client.
+     *
+     * @return The client's input as a string.
+     */
     public String getRequestInput() {
         String message = "";
         try {
@@ -235,6 +287,11 @@ public class ClientHandler implements Runnable {
         return message;
     }
 
+    /**
+     * Sends a response regarding the question status to the client.
+     *
+     * @param status The status message (e.g., Correct, Wrong).
+     */
     public void sendResponseToQuestion(String status) {
         try {
             dos.writeUTF(status);
@@ -244,30 +301,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // private List<Question> readQuestionsFromCSV() {
-    //     String directoryPath = getQuestionsDirectory();
-    //     List<Question> questions = new ArrayList<>();
-    //     try (BufferedReader br = new BufferedReader(new FileReader(directoryPath))) {
-    //         String line;
-    //         while ((line = br.readLine()) != null) {
-    //             String[] data = line.split(",");
-    //             if (data.length == 3) {
-    //                 String expression = data[0].trim();
-    //                 String answer = data[1].trim();
-    //                 String[] potentialAnswerArray = data[2].trim().replace("\"", "").split(" ");
-    //                 questions.add(new Question(expression, answer, potentialAnswerArray));
-    //             }
-    //         }
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return questions;
-    // }
-
     private void printLineBreak() {
         System.out.println("---------------------------------------------------------------");
     }
 
+    /**
+     * Initializes data streams for client communication.
+     */
     private void initialiseDataStreams() {
         try {
             this.dis = new DataInputStream(clientSocket.getInputStream());
@@ -281,6 +321,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Retrieves input from the client.
+     *
+     * @return The client's input as a string.
+     */
     public String readRequest () {
         String message = "";
         try {
@@ -295,6 +340,9 @@ public class ClientHandler implements Runnable {
         return message;
     }
 
+    /**
+     * Disconnects the client.
+     */
     public void disconnectClient () {
         System.out.println("Client " + clientIdentifier + " disconnected.");
         try {
@@ -306,6 +354,9 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Send a close message to the client.
+     */
     public void sendCloseFlag () {
         try {
             dos.writeUTF("close");
@@ -316,20 +367,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // public String getQuestionsDirectory() {
-    //     String directoryPath = "";
-    //     try {
-    //         String path = new File(ClientHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-    //         String otherFilePath = "/../src/main/java/za/co/theemlaba/server/questions/";
-    //         directoryPath = new File(path).getParent() + otherFilePath + QUESTIONS_FILE;
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //         System.out.println("Failed to read questions from CSV");
-    //         System.exit(0);
-    //     }
-    //     return directoryPath;
-    // }
-
+    /**
+     * This method generates a list of option numbers based on the given number of options.
+     *
+     * @param numberOfOptions The total number of options.
+     * @return A list of option numbers as strings.
+     */
     public List<String> getOptionNumbers(int numberOfOptions) {
         List<String> stringList = new ArrayList<>();
         
@@ -340,6 +383,14 @@ public class ClientHandler implements Runnable {
         return stringList;
     }
 
+    /**
+     * This method calculates the percentage score based on the number of correct answers.
+     *
+     * @param part The number of correct answers.
+     * @param whole The total number of questions.
+     * @return The percentage score as a double.
+     * @throws IllegalArgumentException If the whole value is zero.
+     */
     public static double calculatePercentage(int part, int whole) {
         if (whole == 0) {
             throw new IllegalArgumentException("The whole value cannot be zero.");
@@ -347,10 +398,12 @@ public class ClientHandler implements Runnable {
         return (part * 100 / whole);
     }
 
+    /**
+     * This method resets the values for the game.
+     */
     public void resetValues() {
         score = 0;
         reviewQuestionsMap.clear();
         questions.clear();
     }
-
 }
