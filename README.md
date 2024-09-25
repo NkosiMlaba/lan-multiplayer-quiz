@@ -1,6 +1,6 @@
 # LAN Multiplayer Quiz
 
-This is a light weight multiplayer quiz game that can be played over a local area network (LAN). The application is built using Java.
+This is a light weight multiplayer quiz game that can be played over a local area network (LAN). The application is built using Java. This program aids students in practice for multiple choice questions and provides feedback to users on their performance.
 
 ## Output
 ![Demo](program-output/1.png)
