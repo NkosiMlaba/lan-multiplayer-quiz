@@ -20,11 +20,11 @@ public class Server {
         startServer(serverObject);
     }
 
-    static private void printLineBreak() {
+    public static void printLineBreak() {
         System.out.println("---------------------------------------------------------------");
     }
 
-    static void printWelcomeMessage(String[] args) {
+    public static void printWelcomeMessage(String[] args) {
         printLineBreak();
         System.out.println("Server address: " + NetworkInfo.main(args));
         System.out.println("Port number: " + port + "\n");
@@ -32,7 +32,7 @@ public class Server {
         printLineBreak();
     }
 
-    static void startServer(Server serverObject) {
+    public static void startServer(Server serverObject) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server started. Listening for incoming connections...");
             while (true) {
@@ -48,5 +48,9 @@ public class Server {
         catch (Exception e) {
             System.out.println("Server can not be open, server closed...");
         }
+    }
+
+    public static int getPort () {
+        return port;
     }
 }

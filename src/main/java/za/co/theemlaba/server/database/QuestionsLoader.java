@@ -17,7 +17,7 @@ public class QuestionsLoader {
     private String databaseUrl;
 
     public QuestionsLoader(String databaseUrl) {
-        this.databaseUrl = databaseUrl;
+        setDatabaseUrl(databaseUrl);
     }
 
     public void loadFiles(String[] csvFiles) {
@@ -36,7 +36,6 @@ public class QuestionsLoader {
 
     private void createTable(String tableName) {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-                // "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "question TEXT NOT NULL," +
                 "answer TEXT NOT NULL," +
                 "options TEXT NOT NULL" +
@@ -92,12 +91,22 @@ public class QuestionsLoader {
         File[] listOfFiles = folder.listFiles();
         
         if (listOfFiles == null) {
-            return new String[0]; // Return an empty array if the folder does not exist or is not a directory
+            return new String[0];
         }
 
         return Arrays.stream(listOfFiles)
                      .filter(File::isFile)
                      .map(File::getAbsolutePath)
                      .toArray(String[]::new);
+    }
+
+    public String getDatabaseUrl() {
+        return databaseUrl;
+    }
+
+    public void setDatabaseUrl(String databaseUrl) {
+        if (databaseUrl == null) throw new NullPointerException();
+        
+        this.databaseUrl = databaseUrl;
     }
 }
