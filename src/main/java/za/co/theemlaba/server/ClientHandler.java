@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import za.co.theemlaba.server.database.DatabaseReader;
 import za.co.theemlaba.server.online.RunPythonScript;
 
 
@@ -21,6 +22,9 @@ public class ClientHandler implements Runnable {
     Scanner commandLine;
     String regexCaseInsetitiveString = "(?i)";
     boolean quitFlag = false;
+            DatabaseReader reader = new DatabaseReader("jdbc:sqlite:src/main/resources/database/questions.db");
+
+
 
     // game
     int score = 0;
