@@ -1,14 +1,24 @@
 # LAN Multiplayer Quiz
 
-This is a simple multiplayer quiz game that can be played over a local area network (LAN). The application is built using Java core and SocketIO.
+This is a light weight multiplayer quiz game that can be played over a local area network (LAN). The application is built using Java.
 
-## Project Status: ![Status](https://img.shields.io/badge/status-in%20progress-yellow)
-This project is currently in active development.
+## Output
+![Demo](program-output/1.png)
+
+## Project Status ![Status](https://img.shields.io/badge/status-completed-brightgreen)
+1. Current completed features:
+    - Multiplayer over LAN
+    - Score tracking and reviews
+    - Database question functionality
+    - Llama3 integration in question explanation
+
+2. Additional features looking to develop:
+    - Leaderboard
 
 ## System Requirements:
 
 - A linux operating system
-- Java 11 or higher
+- JDK 22 or higher
 - Maven
 - Access to a terminal that supports ANSI colors and Unicode characters
 
@@ -23,28 +33,6 @@ This project is currently in active development.
 2. Install dependencies: [setup](#setup)
 3. Compile and test the project: [compile](#compiling-and-testing-the-project)
 4. Running instructions: [run](#running-the-program)
-
-## Setup:
-
-1. On a linux machine, connect to the internet and run:
-        
-        sudo apt update
-
-2. To install maven run:
-        
-        sudo apt install maven -y
-
-3. To verify the installation, run:
-        
-        mvn -version
-
-4. Install java using:
-        
-        sudo apt install default-jdk -y
-
-5. To verify the installation, run:
-        
-        java -version
 
 #### Additional Setup Instructions (If intending to host the Server):
 1. Insert your Groq API key:
