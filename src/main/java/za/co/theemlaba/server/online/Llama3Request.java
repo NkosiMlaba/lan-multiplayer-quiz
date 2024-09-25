@@ -22,7 +22,13 @@ public class Llama3Request {
             throw new IllegalStateException("API_KEY environment variable not set");
         }
 
-        String prompt = args[0];
+        String prompt;
+        try {
+            prompt = args[0];
+        } catch (Exception e) {
+            prompt = "";
+        }
+        
         Llama3Request script = new Llama3Request();
         HttpResponse<JsonNode> response = script.sendGroqRequest(script.makeJsonString(prompt), apiKey);
         JsonNode jsonObject = response.getBody();

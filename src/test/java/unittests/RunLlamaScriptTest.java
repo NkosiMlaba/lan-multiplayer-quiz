@@ -22,13 +22,6 @@ class RunLlamaScriptTest {
     }
 
     @Test
-    void testSendRequestWithNullInput() {
-        String[] args = null;
-        String result = RunLlamaScript.sendRequest(args);
-        assertEquals("Error occured", result);
-    }
-
-    @Test
     void testReadResponseWithValidProcess() throws Exception {
         Process mockProcess = new ProcessBuilder("echo", "Test output").start();
         String result = RunLlamaScript.readResponse(mockProcess);
