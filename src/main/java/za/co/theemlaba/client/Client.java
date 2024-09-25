@@ -60,7 +60,7 @@ public class Client {
     }
 
     static private void printLineBreak() {
-        System.out.println("---------------------------------------------------------------");
+        System.out.println(Colors.ANSI_RESET + "---------------------------------------------------------------");
     }
 
     static public void connectToServer() {
@@ -101,36 +101,80 @@ public class Client {
         String command = "";
         while (true) {
             String response = readResponse();
-            System.out.println(response);
+            String responseinLowerCase = response.toLowerCase();
 
-            // close from server
-            if (response.toLowerCase().startsWith("correct") || response.toLowerCase().startsWith("wrong") ||
-            response.startsWith("For a final")) {
+            if (responseinLowerCase.startsWith("what")
+            || responseinLowerCase.startsWith("choose")) {
+                System.out.println(Colors.ANSI_YELLOW + response);
+                continue;
+            }
+
+            if (responseinLowerCase.startsWith("question")) {
                 printLineBreak();
+                printLineBreak();
+                System.out.println(Colors.ANSI_YELLOW + response);
+                continue;
             }
             
-            if (response.equalsIgnoreCase("close") || response.equalsIgnoreCase("quit")) {
+
+            // special prompts, no input
+            if (responseinLowerCase.startsWith("for a final")
+            
+            || responseinLowerCase.startsWith("what is")) {
+                System.out.println(Colors.ANSI_YELLOW + response);
+                printLineBreak();
+                continue;
+            }
+
+            if (responseinLowerCase.startsWith("correct")
+            || responseinLowerCase.startsWith("the correct")) {
+                System.out.println(Colors.ANSI_GREEN + response);
+                printLineBreak();
+                continue;
+            }
+
+            if (responseinLowerCase.startsWith("wrong")
+            || responseinLowerCase.startsWith("your answer")) {
+                System.out.println(Colors.ANSI_RED + response);
+                printLineBreak();
+                continue;
+            }
+            
+            // quit
+            if (responseinLowerCase.equalsIgnoreCase("close") 
+            || responseinLowerCase.equalsIgnoreCase("quit")) {
+                System.out.println(Colors.ANSI_YELLOW + "Program is closing...");
                 closeSocket();
                 break;
             }
 
             // for a question
-            if (response.toLowerCase().startsWith("options")) {
+            if (responseinLowerCase.startsWith("options")) {
+                System.out.println(Colors.ANSI_YELLOW + response);
                 command = line.nextLine();
                 sendRequest(command);
+                printLineBreak();
+                continue;
             }
 
-            // should restart game?
-            if (response.toLowerCase().startsWith("should") 
-            || response.toLowerCase().startsWith("would you")
-            || response.toLowerCase().startsWith("ask meta AI for an explanation?")) {
+            // special prompts, input required
+            if (responseinLowerCase.startsWith("should") 
+            || responseinLowerCase.startsWith("would you")
+            || responseinLowerCase.startsWith("ask meta")) {
+                System.out.println(Colors.ANSI_YELLOW + response);
                 command = line.nextLine();
                 sendRequest(command);
+                printLineBreak();
+                continue;
             }
 
             if (command.matches("quit")){
+                System.out.println(Colors.ANSI_YELLOW + "Successfully exited.");
                 break;
             }
+
+            System.out.println(Colors.ANSI_CYAN + response);
+            printLineBreak();
         }
     }
 }

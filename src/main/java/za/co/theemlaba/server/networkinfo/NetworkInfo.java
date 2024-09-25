@@ -6,7 +6,6 @@ import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
 
-
 /**
  * Utility class to retrieve network information.
  */

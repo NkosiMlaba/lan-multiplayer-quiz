@@ -46,7 +46,7 @@ public class Server {
             }
         }
         catch (Exception e) {
-            System.out.println("Server closed");
+            System.out.println("Server can not be open, server closed...");
         }
     }
 }

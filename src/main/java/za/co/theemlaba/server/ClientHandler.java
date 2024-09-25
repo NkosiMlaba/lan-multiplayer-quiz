@@ -11,8 +11,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import za.co.theemlaba.server.database.DatabaseReader;
-import za.co.theemlaba.server.online.RunPythonScript;
-
+import za.co.theemlaba.server.online.RunLlamaScript;
 
 public class ClientHandler implements Runnable {
     final Socket clientSocket;
@@ -22,16 +21,11 @@ public class ClientHandler implements Runnable {
     Scanner commandLine;
     String regexCaseInsetitiveString = "(?i)";
     boolean quitFlag = false;
-            DatabaseReader reader = new DatabaseReader("jdbc:sqlite:src/main/resources/database/questions.db");
+    DatabaseReader reader = new DatabaseReader("jdbc:sqlite:src/main/resources/database/questions.db");
 
-
-
-    // game
     int score = 0;
-    Map<String, List<Object>> map = new HashMap<>();
-
-    private static final String QUESTIONS_FILE = "questions.csv";
-    List<Question> questions = readQuestionsFromCSV();
+    Map<Integer, List<Object>> reviewQuestionsMap = new HashMap<>();
+    List<Question> questions = new ArrayList<>();
 
     public ClientHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -56,8 +50,42 @@ public class ClientHandler implements Runnable {
                 break;
             }
         }
-        // getCategory();
+        
         game();
+    }
+    
+    public void getCategory() {
+        List<String> categories = reader.getQuestionCategories();
+        sendMessage("Choose a category:");
+        sendOptions(categories);
+        String chosenCategory = getRequestInput().strip();
+
+        int categoryIndex = 0;
+        try {
+            categoryIndex = Integer.parseInt(chosenCategory);
+        } catch (Exception e) {
+            sendMessage("Invalid category. Please try again.");
+            getCategory();
+        }
+
+        Map<Integer, String> categoryMap = mapCategoryToNumber(categories);
+
+        if (categoryMap.keySet().contains(categoryIndex)) {
+            questions = reader.getQuestionsFromCategory(categoryMap.get(categoryIndex));
+            sendMessage("You have chosen " + categoryMap.get(categoryIndex) + " category.");
+        } else {
+            sendMessage("Invalid category. Please try again.");
+            getCategory();
+        }
+    }
+
+
+    public Map<Integer, String> mapCategoryToNumber (List<String> categories) {
+        Map<Integer, String> map = new HashMap<>();
+        for (int i = 0; i < categories.size(); i++) {
+            map.put(i + 1, categories.get(i));
+        }
+        return map;
     }
 
     private String getClientIdentifier(Socket clientSocket) {
@@ -65,8 +93,10 @@ public class ClientHandler implements Runnable {
     }
 
     public void game() {
-        Collections.shuffle(questions);
         resetValues();
+        
+        getCategory();
+        Collections.shuffle(questions);
         sendEachQuestion();
         sendResponseToQuestion("Game over");
         finaliseScore();
@@ -85,7 +115,7 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendEachQuestion () {
-        Map<String, List<Object>> map = new HashMap<>();
+        int count = 1;
         for (Question currentQuestion : questions) {
             sendQuestion(currentQuestion.getExpression());
             String[] optionsGiven = currentQuestion.getPotentialAnswers();
@@ -97,6 +127,7 @@ public class ClientHandler implements Runnable {
             String userAnswer = getRequestInput().strip();
 
             ArrayList<Object> options = new ArrayList<>();
+            options.add(currentQuestion.getExpression());
             options.add(currentQuestion.getCorrectAnswer());
 
             List<String> numberOfOptionsList = getOptionNumbers(ListOfOptionsGiven.size());
@@ -114,7 +145,9 @@ public class ClientHandler implements Runnable {
                 sendResponseToQuestion("Wrong");
                 options.add(userAnswer);
             }
-            map.put(currentQuestion.getExpression(), options);
+
+            reviewQuestionsMap.put(count, options);
+            count++;
         }
     }
 
@@ -136,16 +169,19 @@ public class ClientHandler implements Runnable {
 
     public void reviewAnswers () {
         String message = "";
-        for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
-                
-            sendResponseToQuestion("Question: " + entry.getKey());
+        for (Map.Entry<Integer, List<Object>> entry : reviewQuestionsMap.entrySet()) {
             List<Object> answers = entry.getValue();
-            sendResponseToQuestion("The Correct Answer Was: " + answers.get(0));
+            String questionExpression = answers.get(0).toString();
+            String correctAnswerExpression = answers.get(1).toString();
+            String userAnswerExpression = answers.get(2).toString();
+            sendResponseToQuestion("Question " + entry.getKey() + ": " + questionExpression);
+            
+            sendResponseToQuestion("The Correct Answer Was: " + correctAnswerExpression);
 
-            if (answers.get(1).equals(answers.get(0))) {
+            if (userAnswerExpression.equalsIgnoreCase(correctAnswerExpression)) {
                 continue;
             } else {
-                sendResponseToQuestion("Your Answer Was: " + answers.get(1));
+                sendResponseToQuestion("Your Answer Was: " + userAnswerExpression);
                 sendResponseToQuestion("Ask meta AI for an explanation?(yes/no)");
             }
 
@@ -163,10 +199,10 @@ public class ClientHandler implements Runnable {
             }
 
             if (!message.equalsIgnoreCase("yes")) {
-                break;
+                continue;
             }   
-            String prompt = "Why is " + answers.get(0).toString() + " the answer to '" + entry.getKey().replace("\"", "").toString() + "'?";
-            String result = RunPythonScript.sendRequest(new String[] {prompt});
+            String prompt = "Why is " + correctAnswerExpression + " the answer to '" + questionExpression.replace("\"", "").toString() + "'?";
+            String result = RunLlamaScript.sendRequest(new String[] {prompt});
             sendResponseToQuestion(result);
         }
     }
@@ -229,25 +265,25 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private List<Question> readQuestionsFromCSV() {
-        String directoryPath = getQuestionsDirectory();
-        List<Question> questions = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(directoryPath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 3) {
-                    String expression = data[0].trim();
-                    String answer = data[1].trim();
-                    String[] potentialAnswerArray = data[2].trim().replace("\"", "").split(" ");
-                    questions.add(new Question(expression, answer, potentialAnswerArray));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return questions;
-    }
+    // private List<Question> readQuestionsFromCSV() {
+    //     String directoryPath = getQuestionsDirectory();
+    //     List<Question> questions = new ArrayList<>();
+    //     try (BufferedReader br = new BufferedReader(new FileReader(directoryPath))) {
+    //         String line;
+    //         while ((line = br.readLine()) != null) {
+    //             String[] data = line.split(",");
+    //             if (data.length == 3) {
+    //                 String expression = data[0].trim();
+    //                 String answer = data[1].trim();
+    //                 String[] potentialAnswerArray = data[2].trim().replace("\"", "").split(" ");
+    //                 questions.add(new Question(expression, answer, potentialAnswerArray));
+    //             }
+    //         }
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    //     return questions;
+    // }
 
     private void printLineBreak() {
         System.out.println("---------------------------------------------------------------");
@@ -301,19 +337,19 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public String getQuestionsDirectory() {
-        String directoryPath = "";
-        try {
-            String path = new File(ClientHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-            String otherFilePath = "/../src/main/java/za/co/theemlaba/server/questions/";
-            directoryPath = new File(path).getParent() + otherFilePath + QUESTIONS_FILE;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Failed to read questions from CSV");
-            System.exit(0);
-        }
-        return directoryPath;
-    }
+    // public String getQuestionsDirectory() {
+    //     String directoryPath = "";
+    //     try {
+    //         String path = new File(ClientHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+    //         String otherFilePath = "/../src/main/java/za/co/theemlaba/server/questions/";
+    //         directoryPath = new File(path).getParent() + otherFilePath + QUESTIONS_FILE;
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //         System.out.println("Failed to read questions from CSV");
+    //         System.exit(0);
+    //     }
+    //     return directoryPath;
+    // }
 
     public List<String> getOptionNumbers(int numberOfOptions) {
         List<String> stringList = new ArrayList<>();
@@ -334,7 +370,8 @@ public class ClientHandler implements Runnable {
 
     public void resetValues() {
         score = 0;
-        map.clear();
+        reviewQuestionsMap.clear();
+        questions.clear();
     }
 
 }

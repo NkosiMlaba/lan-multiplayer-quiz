@@ -3,7 +3,7 @@ package za.co.theemlaba.server.online;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class RunPythonScript {
+public class RunLlamaScript {
     public static String sendRequest (String[] args) {
         try {
             String paragraph = Llama3Request.main(args);

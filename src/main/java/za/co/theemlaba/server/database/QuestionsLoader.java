@@ -8,6 +8,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.io.File;
+import java.util.Arrays;
+
 
 public class QuestionsLoader {
 
@@ -80,7 +83,21 @@ public class QuestionsLoader {
 
     public static void main(String[] args) {
         QuestionsLoader loader = new QuestionsLoader("jdbc:sqlite:src/main/resources/database/questions.db");
-        String[] files = {"src/main/resources/questions/Numbers.csv"};
+        String[] files = getFileNames("src/main/resources/questions/");
         loader.loadFiles(files);
+    }
+
+    public static String[] getFileNames(String folderPath) {
+        File folder = new File(folderPath);
+        File[] listOfFiles = folder.listFiles();
+        
+        if (listOfFiles == null) {
+            return new String[0]; // Return an empty array if the folder does not exist or is not a directory
+        }
+
+        return Arrays.stream(listOfFiles)
+                     .filter(File::isFile)
+                     .map(File::getAbsolutePath)
+                     .toArray(String[]::new);
     }
 }
