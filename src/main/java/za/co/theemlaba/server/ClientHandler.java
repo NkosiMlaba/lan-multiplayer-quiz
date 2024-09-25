@@ -115,8 +115,9 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendEachQuestion () {
-        int count = 1;
+        int count = 0;
         for (Question currentQuestion : questions) {
+            count++;
             sendQuestion(currentQuestion.getExpression());
             String[] optionsGiven = currentQuestion.getPotentialAnswers();
             List<String> ListOfOptionsGiven = Arrays.asList(optionsGiven);
@@ -135,6 +136,7 @@ public class ClientHandler implements Runnable {
                 sendResponseToQuestion("Correct");
                 score++;
                 options.add(currentQuestion.getCorrectAnswer());
+                continue;
             }
             else if (numberOfOptionsList.contains(userAnswer)) {
                 sendResponseToQuestion("Wrong");
@@ -147,7 +149,7 @@ public class ClientHandler implements Runnable {
             }
 
             reviewQuestionsMap.put(count, options);
-            count++;
+            
         }
     }
 
@@ -168,42 +170,19 @@ public class ClientHandler implements Runnable {
     }
 
     public void reviewAnswers () {
-        String message = "";
         for (Map.Entry<Integer, List<Object>> entry : reviewQuestionsMap.entrySet()) {
             List<Object> answers = entry.getValue();
             String questionExpression = answers.get(0).toString();
             String correctAnswerExpression = answers.get(1).toString();
             String userAnswerExpression = answers.get(2).toString();
+            
             sendResponseToQuestion("Question " + entry.getKey() + ": " + questionExpression);
-            
             sendResponseToQuestion("The Correct Answer Was: " + correctAnswerExpression);
+            sendResponseToQuestion("Your Answer Was: " + userAnswerExpression);
 
-            if (userAnswerExpression.equalsIgnoreCase(correctAnswerExpression)) {
-                continue;
-            } else {
-                sendResponseToQuestion("Your Answer Was: " + userAnswerExpression);
-                sendResponseToQuestion("Ask meta AI for an explanation?(yes/no)");
-            }
-
-            message = readRequest();
-            
-            if (message.equalsIgnoreCase("already disconnected")) {
-                return;
-            }
-            
-            if (message.equalsIgnoreCase("quit")) {
-                sendMessage("Thank you for playing. Goodbye.");
-                sendCloseFlag();
-                disconnectClient();
-                return;
-            }
-
-            if (!message.equalsIgnoreCase("yes")) {
-                continue;
-            }   
             String prompt = "Why is " + correctAnswerExpression + " the answer to '" + questionExpression.replace("\"", "").toString() + "'?";
             String result = RunLlamaScript.sendRequest(new String[] {prompt});
-            sendResponseToQuestion(result);
+            sendResponseToQuestion("Explanation: \n" + result);
         }
     }
 

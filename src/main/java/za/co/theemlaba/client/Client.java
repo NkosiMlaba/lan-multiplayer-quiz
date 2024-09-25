@@ -104,14 +104,13 @@ public class Client {
             String responseinLowerCase = response.toLowerCase();
 
             if (responseinLowerCase.startsWith("what")
-            || responseinLowerCase.startsWith("choose")) {
+            || responseinLowerCase.startsWith("choose")
+            || responseinLowerCase.startsWith("the correct")) {
                 System.out.println(Colors.ANSI_YELLOW + response);
                 continue;
             }
 
             if (responseinLowerCase.startsWith("question")) {
-                printLineBreak();
-                printLineBreak();
                 System.out.println(Colors.ANSI_YELLOW + response);
                 continue;
             }
@@ -126,8 +125,7 @@ public class Client {
                 continue;
             }
 
-            if (responseinLowerCase.startsWith("correct")
-            || responseinLowerCase.startsWith("the correct")) {
+            if (responseinLowerCase.startsWith("correct")) {
                 System.out.println(Colors.ANSI_GREEN + response);
                 printLineBreak();
                 continue;
